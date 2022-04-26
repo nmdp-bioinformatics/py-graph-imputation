@@ -41,6 +41,8 @@ with open("requirements-tests.txt") as requirements_file:
     test_requirements = requirements_file.read().split("\n")
 
 setup(
+    name="py-grim",
+    version="0.0.1",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
@@ -59,11 +61,9 @@ setup(
     long_description=readme + "\n\n" + history,
     include_package_data=True,
     keywords="grim",
-    name="py-grim",
     packages=find_packages(include=["grim"]),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
-    version="0.0.1",
     zip_safe=False,
 )
