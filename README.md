@@ -1,20 +1,26 @@
-My Project Template
-===================
+# py-grim
 
+## Graph Imputation
 
-How to use the template:
+`py-grim` is the successor of [GRIMM](https://github.com/nmdp-bioinformatics/grimm) written in Python and based on [NetworkX](https://networkx.org/)
 
-1. Create a template by clicking on the "Use this template" button. Make sure to select all branches
-   This will create a new repository with the given name e.g. `urban-potato`
+![GRIM Dependencies](images/py-grim.png)
+
+How to develop on the project locally.
+
+1. Make sure the following pre-requites are installed.
+   1. `git`
+   2. `python >= 3.8`
+   3. build tools eg `make`
 2. Clone the repository locally
     ```shell
-    git clone git@github.com:pbashyal-nmdp/urban-potato.git
-    cd urban-potato
+    git clone git@github.com:pbashyal-nmdp/py-grim
+    cd py-grim
     ```
 3. Make a virtual environment and activate it, run `make venv`
    ```shell
     > make venv
-      python3 -m venv venv --prompt urban-potato-venv
+      python3 -m venv venv --prompt py-grim-venv
       =====================================================================
     To activate the new virtual environment, execute the following from your shell
     source venv/bin/activate
