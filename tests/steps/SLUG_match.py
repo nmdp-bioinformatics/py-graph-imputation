@@ -1,8 +1,8 @@
 from behave import *
 from hamcrest import assert_that, is_
 
-from my_project_template.algorithm.match import slug_match
-from my_project_template.model.slug import SLUG
+from grim.algorithm.match import slug_match
+from grim.model.slug import SLUG
 
 
 @given("the SLUG for patient is {slug}")

@@ -1,5 +1,5 @@
 PROJECT_NAME := $(shell basename `pwd`)
-PACKAGE_NAME := my_project_template
+PACKAGE_NAME := py-grim
 
 .PHONY: clean clean-test clean-pyc clean-build docs help test test-all
 .DEFAULT_GOAL := help
@@ -71,7 +71,7 @@ test: clean-test ## run all(BDD and unit) tests
 	behave
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source my_project_template -m pytest
+	coverage run --source py-grim -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html

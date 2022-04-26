@@ -58,18 +58,18 @@ How to use the template:
     |   |-- HLA_alleles.py
     |   `-- SLUG_match.py
     `-- unit
-        `-- test_my_project_template.py
+        `-- test_grim.py
     ```
-8. Package Module files go in the `my_project_template` directory.
+8. Package Module files go in the `grim` directory.
     ```
-    my_project_template
+    grim
     |-- __init__.py
     |-- algorithm
     |   `-- match.py
     |-- model
     |   |-- allele.py
     |   `-- slug.py
-    `-- my_project_template.py
+    `-- grim.py
     ```
 9. Run all tests with `make test` or different tests with `make behave` or `make pytest`. `make behave` will generate report files and open the browser to the report.
 10. Use `python app.py` to run the Flask service app in debug mode. Service will be available at http://localhost:8080/

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #
-#    my_project_template My Project Template.
+#    grim Graph Imputation
 #    Copyright (c) 2021 Be The Match operated by National Marrow Donor Program. All Rights Reserved.
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
 #
 
 
-"""Tests for `my_project_template` package."""
+"""Tests for `grim` package."""
 
 import pytest
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-#    my_project_template My Project Template.
+#    grim Graph Imputation
 #    Copyright (c) 2021 Be The Match operated by National Marrow Donor Program. All Rights Reserved.
 #
 #    This library is free software; you can redistribute it and/or modify it
@@ -58,12 +58,12 @@ setup(
     license="LGPL 3.0",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
-    keywords="my_project_template",
-    name="my_project_template",
-    packages=find_packages(include=["my_project_template"]),
+    keywords="grim",
+    name="py-grim",
+    packages=find_packages(include=["grim"]),
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/nmdp-bioinformatics/my_project_template",
+    url="https://github.com/nmdp-bioinformatics/py-grim",
     version="0.0.1",
     zip_safe=False,
 )

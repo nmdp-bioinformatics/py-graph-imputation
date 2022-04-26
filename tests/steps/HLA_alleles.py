@@ -1,8 +1,8 @@
 from behave import *
 from hamcrest import assert_that, is_
 
-from my_project_template.model.allele import Allele
-from my_project_template.model.slug import SLUG
+from grim.model.allele import Allele
+from grim.model.slug import SLUG
 
 
 @given("The Locus of Gene is {locus}")

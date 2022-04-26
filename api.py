@@ -1,7 +1,7 @@
 from flask import request
 
-from my_project_template.model.allele import InvalidAllele
-from my_project_template.my_project_template import match
+from grim.model.allele import InvalidAllele
+from grim.grim import match
 
 
 def slug_match_controller():
