@@ -45,7 +45,7 @@ setup(
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 1 - Pre-Alpha",
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Natural Language :: English",
