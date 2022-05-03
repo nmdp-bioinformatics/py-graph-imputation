@@ -15,7 +15,7 @@ How to develop on the project locally.
    3. build tools eg `make`
 2. Clone the repository locally
     ```shell
-    git clone git@github.com:pbashyal-nmdp/py-grim
+    git clone git@github.com:nmdp-bioinformatics/py-grim.git
     cd py-grim
     ```
 3. Make a virtual environment and activate it, run `make venv`
