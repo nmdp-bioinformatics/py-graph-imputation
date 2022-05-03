@@ -1,4 +1,5 @@
 # py-grim
+[![PyPi Version](https://img.shields.io/pypi/v/py-grim.svg)](https://pypi.python.org/pypi/py-grim)
 
 ## Graph Imputation
 
