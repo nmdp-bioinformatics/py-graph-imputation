@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/nmdp-bioinformatics/py-grim/issues.
+Report bugs at https://github.com/nmdp-bioinformatics/py-graph-imputation/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,14 +38,14 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-py-grim could always use more documentation, whether as part of the
-official py-grim docs, in docstrings, or even on the web in blog posts,
+py-graph-imputation could always use more documentation, whether as part of the
+official py-graph-imputation docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/nmdp-bioinformatics/py-grim/issues.
+The best way to send feedback is to file an issue at https://github.com/nmdp-bioinformatics/py-graph-imputation/issues.
 
 If you are proposing a feature:
 
@@ -57,16 +57,16 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `py-grim` for local development.
+Ready to contribute? Here's how to set up `py-graph-imputation` for local development.
 
-1. Fork the `py-grim` repo on GitHub.
+1. Fork the `py-graph-imputation` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/py-grim.git
+    $ git clone git@github.com:your_name_here/py-graph-imputation.git
 
 3. Install your local copy into a virtual environment. This is how you set up your fork for local development::
 
-    $ cd py-grim/
+    $ cd py-graph-imputation/
     $ make venv
     $ source venv/bin/activate
     $ make install
