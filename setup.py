@@ -41,7 +41,7 @@ with open("requirements-tests.txt") as requirements_file:
     test_requirements = requirements_file.read().split("\n")
 
 setup(
-    name="py-grim",
+    name="py-graph-imputation",
     version="0.0.3",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
