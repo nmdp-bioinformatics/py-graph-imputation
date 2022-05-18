@@ -1,11 +1,11 @@
-# py-grim
-[![PyPi Version](https://img.shields.io/pypi/v/py-grim.svg)](https://pypi.python.org/pypi/py-grim)
+# py-graph-imputation
+[![PyPi Version](https://img.shields.io/pypi/v/py-graph-imputation.svg)](https://pypi.python.org/pypi/py-graph-imputation)
 
 ## Graph Imputation
 
-`py-grim` is the successor of [GRIMM](https://github.com/nmdp-bioinformatics/grimm) written in Python and based on [NetworkX](https://networkx.org/)
+`py-graph-imputation` is the successor of [GRIMM](https://github.com/nmdp-bioinformatics/grimm) written in Python and based on [NetworkX](https://networkx.org/)
 
-![GRIM Dependencies](images/py-grim.png)
+![GRIM Dependencies](images/py-graph-imputation.png)
 
 How to develop on the project locally.
 
@@ -15,13 +15,13 @@ How to develop on the project locally.
    3. build tools eg `make`
 2. Clone the repository locally
     ```shell
-    git clone git@github.com:nmdp-bioinformatics/py-grim.git
-    cd py-grim
+    git clone git@github.com:nmdp-bioinformatics/py-graph-imputation.git
+    cd py-graph-imputation
     ```
 3. Make a virtual environment and activate it, run `make venv`
    ```shell
     > make venv
-      python3 -m venv venv --prompt py-grim-venv
+      python3 -m venv venv --prompt py-graph-imputation-venv
       =====================================================================
     To activate the new virtual environment, execute the following from your shell
     source venv/bin/activate
