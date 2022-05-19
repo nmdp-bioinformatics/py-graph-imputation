@@ -21,19 +21,25 @@
 #    > http://www.fsf.org/licensing/licenses/lgpl.html
 #    > http://www.opensource.org/licenses/lgpl-license.php
 #
-from .algorithm.match import slug_match
-from .model.slug import SLUG
 
 
-def match(patient_slug_glstring, donor_slug_glstring):
-    """
-    Perform match on GL String versions of SLUGs
+from validation import runfile
+from imputation.graph_generation import generate_neo4j_multi_hpf
 
-    @param patient_slug_glstring: Patient's SLUG in GL String format
-    @param donor_slug_glstring: Donor's SLUG in GL String format
-    @return: bool indicating Match or No Match
-    """
-    patient_slug = SLUG.from_glstring(patient_slug_glstring)
-    donor_slug = SLUG.from_glstring(donor_slug_glstring)
-    matched = slug_match(patient_slug, donor_slug)
-    return donor_slug, matched, patient_slug
+from imputation.imputegl import Imputation
+from imputation.imputegl.networkx_graph import Graph
+
+def graph_freqs(conf_file = "./conf/minimal-configuration.json", for_em = False,  em_pop=None, freq_file='hpf.csv', path='imputation/graph_generation/' ):
+    generate_neo4j_multi_hpf.generate_graph(freq_file=freq_file, path=path, config_file=conf_file, em_pop=em_pop,
+                       em=for_em)
+
+def impute(conf_file = "./conf/minimal-configuration.json"):
+    runfile.run_impute(conf_file)
+
+def impute_instance(config):
+    graph = Graph(config)
+    graph.build_graph(config["node_file"], config["top_links_file"], config["edges_file"])
+    imputation = Imputation(graph, config)
+    return imputation
+
+
