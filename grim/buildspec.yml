@@ -1,0 +1,17 @@
+version: 0.2
+
+env:
+  variables:
+    APP_NAME: "graph-imputation"
+
+
+phases:
+  install:
+    commands:
+      - python --version
+    finally:
+      - echo "Done installing"
+
+  build:
+    commands:
+      - ./build-imputation-validation.sh
