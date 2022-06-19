@@ -192,7 +192,7 @@ def loci_order(loc_values):
 
     return FULL_LOCI, full_name_index_dict
 
-def generate_graph(freq_file = 'hpf.csv', path = '', config_file = "../../conf/minimal-configuration.json", em_pop = None, em= False):
+def generate_graph(freq_file = 'output/hpf.csv', path = '', config_file = "../../conf/minimal-configuration.json", em_pop = None, em= False):
     ##############################################################################
     # Configure
     ##############################################################################
@@ -201,7 +201,7 @@ def generate_graph(freq_file = 'hpf.csv', path = '', config_file = "../../conf/m
     pathlib.Path(csvdir).mkdir(parents=True, exist_ok=True)
 
     # Input file
-    freq_file = path + 'output/' + freq_file
+    freq_file = path  + freq_file
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config",

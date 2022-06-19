@@ -7,19 +7,20 @@ import os
 
 sys.path.insert(0, os.path.join(".."))
 
-from imputation.imputegl import Imputation
-from imputation.imputegl.networkx_graph import Graph
+from ..imputation.imputegl import Imputation
+from ..imputation.imputegl.networkx_graph import Graph
 
 # Profiler start
 #pr = cProfile.Profile()
 #pr.enable()
 
-def run_impute(conf_file = "../conf/minimal-configuration.json"):
+def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir = ""):
 
     configuration_file = conf_file
 
-    project_dir = ""# "../"
+    #project_dir = ""# "../"
     output_dir = "output/"
+
 
     # Read configuration file and load properties
     with open(configuration_file) as f:
