@@ -192,16 +192,17 @@ def loci_order(loc_values):
 
     return FULL_LOCI, full_name_index_dict
 
-def generate_graph(freq_file = 'output/hpf.csv', path = '', config_file = "../../conf/minimal-configuration.json", em_pop = None, em= False):
+def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop = None, em= False):
     ##############################################################################
     # Configure
     ##############################################################################
     # set output directory and create it if it doesn't exist
-    csvdir = path +"output/csv"
+    csvdir = "output/csv"
     pathlib.Path(csvdir).mkdir(parents=True, exist_ok=True)
 
+
     # Input file
-    freq_file = path  + freq_file
+    #freq_file = path  + freq_file
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config",
@@ -222,6 +223,9 @@ def generate_graph(freq_file = 'output/hpf.csv', path = '', config_file = "../..
         pops = em_pop
     freq_trim = conf.get("freq_trim_threshold")
 
+    freq_file =  conf.get("freq_file", "default" )
+    if freq_file == "default":
+        freq_file = os.path.dirname(os.path.realpath(__file__)) +  '/output/hpf.csv'
     dict_count_of_pop = {}
     #if em:
     for pop in pops:

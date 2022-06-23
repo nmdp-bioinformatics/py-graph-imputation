@@ -14,18 +14,24 @@ from ..imputation.imputegl.networkx_graph import Graph
 #pr = cProfile.Profile()
 #pr.enable()
 
-def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir = ""):
+def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir_graph = "", project_dir_in_file = ""):
 
     configuration_file = conf_file
 
     #project_dir = ""# "../"
-    output_dir = "output/"
+    #output_dir = "output/"
 
 
     # Read configuration file and load properties
     with open(configuration_file) as f:
         json_conf = json.load(f)
 
+    graph_files_path = json_conf.get("graph_files_path")
+    if graph_files_path[-1] != '/':
+        graph_files_path += '/'
+    output_dir = json_conf.get("imuptation_out_path", "output")
+    if output_dir[-1] != '/':
+        output_dir += '/'
     config = {
         "planb": json_conf.get('planb', True),
         "pops": json_conf.get('populations'),
@@ -35,10 +41,10 @@ def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir = "
         "number_of_pop_results": json_conf.get('number_of_pop_results', 100),
         "output_MUUG": json_conf.get("output_MUUG", True),
         "output_haplotypes": json_conf.get("output_haplotypes", False),
-        "node_file": project_dir + json_conf.get("node_csv_file"),
-        "top_links_file": project_dir + json_conf.get("top_links_csv_file"),
-        "edges_file": project_dir + json_conf.get("edges_csv_file"),
-        "imputation_input_file": project_dir+  json_conf.get("imputation_in_file"),
+        "node_file": project_dir_graph + graph_files_path + json_conf.get("node_csv_file"),
+        "top_links_file": project_dir_graph + graph_files_path + json_conf.get("top_links_csv_file"),
+        "edges_file": project_dir_graph + graph_files_path +json_conf.get("edges_csv_file"),
+        "imputation_input_file": project_dir_in_file + json_conf.get("imputation_in_file"),
         "imputation_out_umug_freq_file": output_dir + json_conf.get("imputation_out_umug_freq_filename"),
         "imputation_out_umug_pops_file": output_dir + json_conf.get("imputation_out_umug_pops_filename"),
         "imputation_out_hap_freq_file": output_dir + json_conf.get("imputation_out_hap_freq_filename"),
@@ -55,11 +61,11 @@ def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir = "
                     [[1], [2, 3], [4], [5]],
                     [[1], [2], [3], [4], [5]]
                 ]),
-        "pops_count_file": project_dir + json_conf.get("pops_count_file",'' ),
+        "pops_count_file": project_dir_graph + json_conf.get("pops_count_file",'' ),
         "use_pops_count_file": json_conf.get("pops_count_file",False),
         "number_of_options_threshold": json_conf.get("number_of_options_threshold", 100000),
         "max_haplotypes_number_in_phase": json_conf.get("max_haplotypes_number_in_phase",100 ),
-        "bin_imputation_input_file": project_dir + json_conf.get("bin_imputation_in_file", "None"),
+        "bin_imputation_input_file": project_dir_in_file + json_conf.get("bin_imputation_in_file", "None"),
         "nodes_for_plan_A": json_conf.get("Plan_A_Matrix", []),
         "save_mode": json_conf.get("save_space_mode", False)
 

@@ -35,10 +35,11 @@
   "number_of_pop_results": 100,
   "output_MUUG": true,
   "output_haplotypes": true,
-  "node_csv_file": "imputation/graph_generation/output/csv/nodes.csv",
-  "edges_csv_file": "imputation/graph_generation/output/csv/edges.csv",
-  "info_node_csv_file": "imputation/graph_generation/output/csv/info_node.csv",
-  "top_links_csv_file": "imputation/graph_generation/output/csv/top_links.csv",
+  "graph_files_path": "output/csv" ,
+  "node_csv_file": "nodes.csv",
+  "edges_csv_file": "edges.csv",
+  "info_node_csv_file": "info_node.csv",
+  "top_links_csv_file": "top_links.csv",
   "imputation_in_file": "validation/simulation/data/simulated_donor.csv",
   "imputation_out_umug_freq_filename": "don.umug.freqs",
   "imputation_out_umug_pops_filename": "don.umug.pops",
@@ -46,5 +47,6 @@
   "imputation_out_hap_pops_filename": "don.hap.pops",
   "imputation_out_miss_filename": "don.miss",
   "imputation_out_problem_filename": "don.problem",
-  "max_haplotypes_number_in_phase": 100
+  "max_haplotypes_number_in_phase": 100,
+  "imuptation_out_path": "output"
 }

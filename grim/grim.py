@@ -30,23 +30,21 @@ from .imputation.imputegl import Imputation
 from .imputation.imputegl.networkx_graph import Graph
 import os
 
-def graph_freqs(conf_file = "", freq_file='default', path='default', for_em = False,  em_pop=None ):
+def graph_freqs(conf_file = "",  for_em = False,  em_pop=None ):
     if conf_file == "":
         conf_file = os.path.dirname(os.path.realpath(__file__))  + '/conf/minimal-configuration.json'
-    if path == "default":
-        path = os.path.dirname(os.path.realpath(__file__)) +  '/imputation/graph_generation/'
-    if freq_file == "default":
-        freq_file = 'output/hpf.csv'
 
-    generate_neo4j_multi_hpf.generate_graph(freq_file=freq_file, path=path, config_file=conf_file, em_pop=em_pop,
+
+    generate_neo4j_multi_hpf.generate_graph(config_file=conf_file,  em_pop=em_pop,
                        em=for_em)
 
 def impute(conf_file = ""):
-    project_dir = ""
+    project_dir_in_file, project_dir_graph = "", ""
     if conf_file == "":
         conf_file = os.path.dirname(os.path.realpath(__file__)) + '/conf/minimal-configuration.json'
-        project_dir = os.path.dirname(os.path.realpath(__file__)) + '/'
-    runfile.run_impute(conf_file, project_dir)
+        project_dir_graph =  os.path.dirname(os.path.realpath(__file__)) + '/imputation/graph_generation/'
+        project_dir_in_file =  os.path.dirname(os.path.realpath(__file__)) + '/'
+    runfile.run_impute(conf_file, project_dir_graph, project_dir_in_file)
 
 def impute_instance(config):
     graph = Graph(config)
