@@ -11,6 +11,7 @@ from operator import indexOf, add
 
 import sys
 import os
+
 #sys.path.insert(0, os.path.join(".."))
 
 
@@ -168,10 +169,10 @@ def labels_for_grap(conf, full_loci,csvdir):
 
     nodes_plan_b = list(set(nodes_plan_b))
     all_combo_list = list(dict.fromkeys(nodes_plan_a + nodes_plan_b + top_nodes_plan_b))
-    with open(csvdir + '/nodes_for_plan_a.txt', 'w') as f:
+    with open(csvdir + 'nodes_for_plan_a.txt', 'w') as f:
         for item in nodes_plan_a:
             f.write("%s\n" % item)
-    with open(csvdir + '/nodes_for_plan_b.txt', 'w') as f:
+    with open(csvdir + 'nodes_for_plan_b.txt', 'w') as f:
         for item in (nodes_plan_b + top_nodes_plan_b):
             f.write("%s\n" % item)
     #pickle.dump(nodes_plan_a, open(csvdir + '/nodes_for_plan_a.pkl', "wb"))
@@ -197,8 +198,8 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     # Configure
     ##############################################################################
     # set output directory and create it if it doesn't exist
-    csvdir = "output/csv"
-    pathlib.Path(csvdir).mkdir(parents=True, exist_ok=True)
+    #csvdir = "output/csv"
+
 
 
     # Input file
@@ -218,6 +219,11 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     with open(configuration_file) as f:
         conf = json.load(f)
 
+    csvdir = conf.get("graph_files_path")
+    pathlib.Path(csvdir).mkdir(parents=True, exist_ok=True)
+    if csvdir[-1] != '/':
+        csvdir += '/'
+
     pops = conf.get("populations")
     if em_pop:
         pops = em_pop
@@ -227,16 +233,19 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     if freq_file == "default":
         freq_file = os.path.dirname(os.path.realpath(__file__)) +  '/output/hpf.csv'
     dict_count_of_pop = {}
-    #if em:
-    for pop in pops:
-            dict_count_of_pop[pop] = freq_trim
-    """else:
-        project_dir = "../../"
-        pop_ratio_dir = project_dir + conf.get("pops_count_file", 'imputation/graph_generation/output/pop_ratio.txt')
+
+    pop_ratio_dir = conf.get("pops_count_file", os.path.dirname(os.path.realpath(__file__)) + '/imputation/graph_generation/output/pop_ratio.txt')
+    path = pathlib.Path(pop_ratio_dir)
+
+
+    if em or not path.is_file():
+        for pop in pops:
+                dict_count_of_pop[pop] = freq_trim
+    else:
         with open(pop_ratio_dir) as f_count:
             for line in f_count:
                 pop, count_pop, ratio = line.strip().split(',')
-                dict_count_of_pop[pop] = freq_trim / float(count_pop)"""
+                dict_count_of_pop[pop] = freq_trim / float(count_pop)
 
 
     # Display the configurations we are using
@@ -360,7 +369,7 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     # #### Build Nodes file
 
     header = ['haplotypeId:ID(HAPLOTYPE)', 'name', 'loci:LABEL', 'frequency:DOUBLE[]']
-    node_file = csvdir + '/nodes.csv'
+    node_file = csvdir + conf.get("node_csv_file")
     with open(node_file, mode='w') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(header)
@@ -373,7 +382,7 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     # #### Build Edges File
 
     edgeheader = [':START_ID(HAPLOTYPE)', ':END_ID(HAPLOTYPE)', 'CP:DOUBLE[]', ':TYPE']
-    edge_file = csvdir + '/edges.csv'
+    edge_file = csvdir + conf.get("edges_csv_file")
     with open(edge_file, mode='w') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(edgeheader)
@@ -396,7 +405,7 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     # #### Generate Top Links file
 
     topheader = [':START_ID(HAPLOTYPE)', ':END_ID(HAPLOTYPE)', ':TYPE']
-    top_links_file = csvdir + '/top_links.csv'
+    top_links_file = csvdir + conf.get("top_links_csv_file")
     with open(top_links_file, mode='w') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(topheader)
@@ -412,7 +421,7 @@ def generate_graph(config_file = "../../conf/minimal-configuration.json", em_pop
     # #### Generate Info Node file
 
     infonode_header = ['INFO_NODE_ID:ID(INFO_NODE)', 'populations:STRING[]', 'INFO_NODE:LABEL']
-    top_links_file = csvdir + '/info_node.csv'
+    top_links_file = csvdir + conf.get("info_node_csv_file")
     with open(top_links_file, mode='w') as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(infonode_header)
