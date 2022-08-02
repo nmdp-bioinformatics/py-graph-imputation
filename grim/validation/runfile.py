@@ -67,7 +67,8 @@ def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir_gra
         "max_haplotypes_number_in_phase": json_conf.get("max_haplotypes_number_in_phase",100 ),
         "bin_imputation_input_file": project_dir_in_file + json_conf.get("bin_imputation_in_file", "None"),
         "nodes_for_plan_A": json_conf.get("Plan_A_Matrix", []),
-        "save_mode": json_conf.get("save_space_mode", False)
+        "save_mode": json_conf.get("save_space_mode", False),
+        "UNK_priors" : json_conf.get("UNK_priors", "MR")
 
     }
 
@@ -76,6 +77,7 @@ def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir_gra
     print("Performing imputation based on:")
     print("\tPopulation: {}".format(config["pops"]))
     print("\tPriority: {}".format(config["priority"]))
+    print("\tPriority: {}".format(config["UNK_priors"]))
     print("\tEpsilon: {}".format(config["epsilon"]))
     print("\tPlan B: {}".format(config["planb"]))
     print("\tNumber of Results: {}".format(config["number_of_results"]))

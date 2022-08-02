@@ -110,6 +110,7 @@ class Imputation(object):
             self.populations = config["pops"]
             self.netGraph = net
             self.priorMatrix = np.ones((len(self.populations), len(self.populations)))
+            self.unk_priors = config["UNK_priors"]
 
             # For plan b
             #self.full_loci = config["full_loci"]
@@ -1419,7 +1420,11 @@ class Imputation(object):
         # no plan b
         for level in range(2):
             if level == 1:
-                self.priorMatrix = np.ones((len(self.populations), len(self.populations)))  ####
+                if self.unk_priors == "MR":
+                    self.priorMatrix = np.ones((len(self.populations), len(self.populations)))
+                else:
+                    self.priorMatrix = np.identity(len(self.populations))
+                #self.priorMatrix = np.ones((len(self.populations), len(self.populations)))  ####
             if planb and len(res['Haps']) == 0:
                 self.plan = 'b'
                 epsilon = 1e-14
@@ -1615,7 +1620,10 @@ class Imputation(object):
 
     def impute_one(self, subject_id, gl, binary, race1, race2, priority, epsilon, n, MUUG_output, haps_output, planb, em):#em
         clean_gl = clean_up_gl(gl)
-        self.priorMatrix =  np.ones((len(self.populations), len(self.populations)))
+        if self.unk_priors == "MR":
+            self.priorMatrix =  np.ones((len(self.populations), len(self.populations)))
+        else:
+            self.priorMatrix = np.identity(len(self.populations))
         to_calc_prior_matrix = False
         if race1 or race2:
             race1 = race1.split(';')

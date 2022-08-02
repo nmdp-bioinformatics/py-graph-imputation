@@ -11,6 +11,7 @@
     "gamma": 1e-7,
     "delta": 0.4999999
   },
+  "UNK_priors": "SR",
   "FULL_LOCI": "ABCQR",
    "loci_map": {
     "A": 1,
@@ -19,6 +20,7 @@
     "DQB1": 4,
     "DRB1": 5
   },
+
   "factor_missing_data": 0.0001,
   "Plan_B_Matrix": [
                 [[1, 2, 3, 4, 5]],
