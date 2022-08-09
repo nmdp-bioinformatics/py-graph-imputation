@@ -46,10 +46,13 @@ def impute(conf_file = ""):
         project_dir_in_file =  os.path.dirname(os.path.realpath(__file__)) + '/'
     runfile.run_impute(conf_file, project_dir_graph, project_dir_in_file)
 
-def impute_instance(config):
+def impute_instance(config, graph, count_by_prob= None):
+    imputation = Imputation(graph, config, count_by_prob)
+    return imputation
+
+def graph_instance(config):
     graph = Graph(config)
     graph.build_graph(config["node_file"], config["top_links_file"], config["edges_file"])
-    imputation = Imputation(graph, config)
-    return imputation
+    return graph
 
 
