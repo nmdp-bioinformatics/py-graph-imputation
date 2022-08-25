@@ -19,16 +19,16 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
 
-def write_best_prob(name_gl, res, probs, numOfResult, fout):
+def write_best_prob(name_gl, res, probs, numOfResult, fout, sign = ","):
     sumProbsDict = defaultdict(list)
     #loop over the result and sum the prob by populations/haplotype
     for k in range(len(res)):
-        key = res[k][0] + "," + res[k][1]
+        key = res[k][0] + sign + res[k][1]
         if key in sumProbsDict:
             sumProb = probs[k] + sumProbsDict[key]
             sumProbsDict[key] = sumProb
         else:
-            key2 = res[k][1] + "," + res[k][0]
+            key2 = res[k][1] + sign + res[k][0]
             if key2 in sumProbsDict:
                 sumProb = probs[k] + sumProbsDict[key2]
                 sumProbsDict[key2] = sumProb
@@ -1727,7 +1727,7 @@ class Imputation(object):
                             write_best_hap_race_pairs(subject_id, haps, pops, probs, number_of_results, fout_hap_haplo)
                             write_best_prob(subject_id, pops, probs, 1, fout_pop_haplo)
                         else:
-                            write_best_prob(subject_id, haps, probs, number_of_results, fout_hap_haplo)
+                            write_best_prob(subject_id, haps, probs, number_of_results, fout_hap_haplo, "+")
                             write_best_prob(subject_id, pops, probs, number_of_pop_results, fout_pop_haplo)
                     if MUUG_output:
                         haps = res_muugs['Haps']
