@@ -1,21 +1,17 @@
-
-
 class CypherQueryPlanB(object):
-    '''
+    """
     classdocs
-    '''
+    """
 
-    def __init__(self, loci_map):#, indexes):
-        '''
+    def __init__(self, loci_map):  # , indexes):
+        """
         Constructor
-        '''
+        """
 
         self.loc_map = loci_map
-        #self.index_dict =  indexes
+        # self.index_dict =  indexes
 
-
-
-    def indexToLocus(self,indexes):
+    def indexToLocus(self, indexes):
         loci = []
 
         # Sort if the indexes are not sorted
@@ -27,7 +23,7 @@ class CypherQueryPlanB(object):
 
         return loci
 
-    def findTypeFromIndexes(self,indexes):
+    def findTypeFromIndexes(self, indexes):
         full_form_loci = self.indexToLocus(indexes)
         return self.findFullFormType(full_form_loci)
 
@@ -36,8 +32,7 @@ class CypherQueryPlanB(object):
         return type
 
     def getLocus(self, allele):
-        """ Get the locus back from any given allele
-        """
+        """Get the locus back from any given allele"""
         loc_allele = allele.split("*")
         return self.loc_map[loc_allele[0]]
 
