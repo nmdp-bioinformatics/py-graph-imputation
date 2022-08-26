@@ -30,29 +30,42 @@ from .imputation.imputegl import Imputation
 from .imputation.imputegl.networkx_graph import Graph
 import os
 
-def graph_freqs(conf_file = "",  for_em = False,  em_pop=None ):
+
+def graph_freqs(conf_file="", for_em=False, em_pop=None):
     if conf_file == "":
-        conf_file = os.path.dirname(os.path.realpath(__file__))  + '/conf/minimal-configuration.json'
+        conf_file = (
+            os.path.dirname(os.path.realpath(__file__))
+            + "/conf/minimal-configuration.json"
+        )
+
+    generate_neo4j_multi_hpf.generate_graph(
+        config_file=conf_file, em_pop=em_pop, em=for_em
+    )
 
 
-    generate_neo4j_multi_hpf.generate_graph(config_file=conf_file,  em_pop=em_pop,
-                       em=for_em)
-
-def impute(conf_file = ""):
+def impute(conf_file=""):
     project_dir_in_file, project_dir_graph = "", ""
     if conf_file == "":
-        conf_file = os.path.dirname(os.path.realpath(__file__)) + '/conf/minimal-configuration.json'
-        project_dir_graph =  os.path.dirname(os.path.realpath(__file__)) + '/imputation/graph_generation/'
-        project_dir_in_file =  os.path.dirname(os.path.realpath(__file__)) + '/'
+        conf_file = (
+            os.path.dirname(os.path.realpath(__file__))
+            + "/conf/minimal-configuration.json"
+        )
+        project_dir_graph = (
+            os.path.dirname(os.path.realpath(__file__))
+            + "/imputation/graph_generation/"
+        )
+        project_dir_in_file = os.path.dirname(os.path.realpath(__file__)) + "/"
     runfile.run_impute(conf_file, project_dir_graph, project_dir_in_file)
 
-def impute_instance(config, graph, count_by_prob= None):
+
+def impute_instance(config, graph, count_by_prob=None):
     imputation = Imputation(graph, config, count_by_prob)
     return imputation
 
+
 def graph_instance(config):
     graph = Graph(config)
-    graph.build_graph(config["node_file"], config["top_links_file"], config["edges_file"])
+    graph.build_graph(
+        config["node_file"], config["top_links_file"], config["edges_file"]
+    )
     return graph
-
-
