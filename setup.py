@@ -62,7 +62,15 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="grim",
-    packages=find_packages(include=["grim"]),
+    packages=find_packages(
+        include=[
+            "grim",
+            "grim.imputation",
+            "grim.imputegl",
+            "grim.imputation.graph_generation",
+            "grim.validation",
+        ]
+    ),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
