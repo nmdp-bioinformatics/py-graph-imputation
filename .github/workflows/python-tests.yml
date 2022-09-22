@@ -28,6 +28,3 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Run BDD Tests
-      run: |
-        behave
