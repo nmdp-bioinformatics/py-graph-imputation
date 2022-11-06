@@ -51,7 +51,7 @@ with open("requirements-tests.txt") as requirements_file:
 
 setup(
     name="py-graph-imputation",
-    version="0.0.4",
+    version="0.0.6",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
@@ -71,7 +71,13 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="grim",
-    packages=find_packages(include=["grim"]),
+    packages=find_packages(include=[
+            "grim",
+            "grim.imputation",
+            "grim.imputation.imputegl",
+            "grim.imputation.graph_generation",
+            "grim.validation",
+        ]),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
