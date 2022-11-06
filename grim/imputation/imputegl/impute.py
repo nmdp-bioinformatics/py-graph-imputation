@@ -7,8 +7,9 @@ from collections import defaultdict
 import os.path
 import json
 
-import numpy as np
 
+import numpy as np
+from .cutils import open_ambiguities, create_hap_list, deepcopy_list
 from .cypher_plan_b import CypherQueryPlanB
 from .cypher_query import CypherQuery
 
@@ -92,6 +93,10 @@ def clean_up_gl(gl):
 
 
 class Imputation(object):
+    __slots__ = 'logger', 'verbose', 'populations', 'netGraph', 'priorMatrix', 'full_hapl', 'index_dict', 'full_loci', \
+                'factor', '_factor_missing_data', 'cypher', 'cypher_plan_b', 'matrix_planb', 'count_by_prob', \
+                'number_of_options_threshold', 'plan', 'option_1', 'option_2', \
+                'haplotypes_number_in_phase', 'save_space_mode', 'nodes_for_plan_A', 'unk_priors'
 
     def __init__(self, net=None,config=None,  count_by_prob=None, verbose=False):
         """Constructor
@@ -291,23 +296,6 @@ class Imputation(object):
                 phases.append([H1, H2])
         return phases
 
-    def open_ambiguities(self, hap, loc):
-        # This opens all allele ambiguities
-        hap_new = [] # produces an empty list of haplotypes
-        for k in range(len(hap)): #slit a given locus in all haps.
-            splitHap =  hap[k][loc].split('/')
-            if splitHap==hap[k][loc].split():
-                split_loc = hap[k][loc].split('|')
-            else:
-                split_loc = splitHap
-            hap1 = hap[k]
-            if len(split_loc) > 1:
-                for i in range(len(split_loc)):
-                    hap1[loc] = split_loc[i]
-                    hap_new.append(hap1[:])
-            else:
-                hap_new.append(hap1[:])
-        return hap_new
 
     def comp_hap_prob(self, Hap, N_Loc, epsilon, n):
         haplo_probs = self.get_haplo_freqs(Hap, epsilon, n)
@@ -350,10 +338,11 @@ class Imputation(object):
     #     return haplo_probs
 
     def get_haplo_freqs(self, haplos, epsilon, n=25000):
-        haplos_joined = ["~".join(item) for sublist in haplos for item in sublist] ###
+        haplos_joined = ["~".join(item) for item in haplos[0]] ###
         #haplos_joined = [item for sublist in haplos for item in sublist]  ###
         #haplos_joined = ["~".join(sorted(item)) for sublist in haplos for item in sublist]
         return self.netGraph.adjs_query(haplos_joined)
+
 
     # def get_haplo_freqs_miss(self, haplos, epsilon):
     #     haplo_probs = {}
@@ -681,7 +670,7 @@ class Imputation(object):
         # pop_res are the names of the populations
         return {'Haps': hap_total, 'Probs': p_total,'Pops': pop_res}
 
-    def reduce_phase_to_valid_allels(self, haps, N_Loc, planc = False):
+    def reduce_phase_to_valid_allels(self, haps, N_Loc, planc=False):
         for j in range(len(haps)):
             for k in range(2):
                 hap_list = []
@@ -689,14 +678,13 @@ class Imputation(object):
 
                 options = 1
                 for i in range(N_Loc): options = options * (len(hap_list[0][i].split("/")))
-                if options>=self.number_of_options_threshold or planc:
+                if options >= self.number_of_options_threshold or planc:
                     for hap_k in hap_list:
-                        for i,g in enumerate(hap_k):
+                        for i, g in enumerate(hap_k):
                             gen = g.split('/')
                             probs = self.check_if_alleles_exist(gen)
                             if not probs == {}:
-                                list(probs.keys())
-                                haps[j][k][i] = ('/').join(list(probs.keys()))
+                                haps[j][k][i] = '/'.join(list(probs.keys()))
 
 
     def reduce_phase_to_commons_alleles(self, haps, N_Loc, commons_number=1, planc = False ):
@@ -733,51 +721,53 @@ class Imputation(object):
         for j in range(len(haps)):
             H1 = []
             H2 = []
-          ##  fq = pa.DataFrame()
+            ##  fq = pa.DataFrame()
             fq = []
 
             for k in range(2):
-                hap_list = []
-                hap_list.append(haps[j][k])
+                hap_list = [haps[j][k]]
+                hap_list_splits = [tuple(allele.split("/")) for allele in hap_list[0]]
 
-                #compute the number of options:
+                # compute the number of options:
                 options = 1
-                for i in range(N_Loc): options=options*(len(hap_list[0][i].split("/")))
+                for i in range(N_Loc):
+                    options *= len(hap_list_splits[i])
 
-                #if the number of options is smaller than the total number of nodes:
+                # if the number of options is smaller than the total number of nodes:
                 if options < self.number_of_options_threshold:
-                    #open ambiguities regularly:
+                    # open ambiguities regularly:
                     for i in range(N_Loc):
-                        hap_list = self.open_ambiguities(hap_list, i)
-                    if (k == 0):
+                        hap_list = self.open_ambiguities(hap_list, i, hap_list_splits[i])
+
+                    if k == 0:
                         H1.append(hap_list)
                     else:
                         H2.append(hap_list)
 
-                    self.option_1 +=1
+                    self.option_1 += 1
 
-                #if there are more options than actual haplotypes possible:
+                # if there are more options than actual haplotypes possible:
                 else:
-                    self.option_2 +=1
-                    optionDict = {}
+                    self.option_2 += 1
+                    optionDict = {} #set()
                     if len(fq) == 0:
-                        list=[]
-                        for (gen,name) in self.cypher.loc_map.items():
-                            count=0
+                        _list = []
+                        for (gen, name) in self.cypher.loc_map.items():
+                            count = 0
                             for i in range(len(hap_list[0])):
-                                if hap_list[0][i].split("*")[0]==gen:
-                                    count=count+1
-                            if count>0:
-                                list.append(name)
-                        #we'll get all the options possible
-                        #(query,lc)=self.cypher.buildQuery(["~".join(list)])
+                                if hap_list[0][i].split("*", 1)[0] == gen:
+                                    count = count + 1
+                            if count > 0:
+                                _list.append(name)
+                        # we'll get all the options possible
+                        # (query,lc)=self.cypher.buildQuery(["~".join(_list)])
 
-                       # fq = pa.DataFrame(self.graph.data(query))
-                        label = "".join(sorted(list))
+                        # fq = pa.DataFrame(self.graph.data(query))
+                        label = "".join(sorted(_list))
                         fq = self.netGraph.haps_by_label(label)
-                       # fq = pa.DataFrame(self.netGraph.abcdq_allele(), )
-                       # fq = self.netGraph.abcdq_allele()
-                        #we'll find which of all the options are compatable with the donor
+                        # fq = pa.DataFrame(self.netGraph.abcdq_allele(), )
+                        # fq = self.netGraph.abcdq_allele()
+                        # we'll find which of all the options are compatable with the donor
                         """gl_list=gl_string.split("^")
                         for gen in gl_list:
                             gens = gen.split('+')
@@ -785,29 +775,15 @@ class Imputation(object):
                                 gen=g.split('/')
                                 for option in gen:
                                     optionDict[option]=True"""
-                    for hap_k in hap_list:
-                        #listType = []
-                        for g in hap_k:
-                            gen = g.split('/')
-                            for option in gen:
-                                optionDict[option] = True
-                        #print(listType)
-                    ##all_haps = fq.values.tolist()
-                    all_haps = fq
-                    hap_list=[]
-                    for i in range(len(all_haps)):
-                        count=0
-                        for gen in all_haps[i].split("~"):
-                            if not gen in optionDict:
-                                break
-                            else:
-                                count=count+1
-                        if count == N_Loc:
 
-                            # all_haps[i][0]=all_haps[i][0].split("~")
-                            #hap_list.append(all_haps[i][0])
-                            hap_list.append(all_haps[i].split("~"))
-                    if (k == 0):
+                    for gen in hap_list_splits:
+                        for option in gen:
+                            optionDict[option] = True
+                            # optionDict.add(option)
+                    ##all_haps = fq.values.tolist()
+                    hap_list = create_hap_list(fq, optionDict, N_Loc)
+
+                    if k == 0:
                         H1.append(hap_list)
                     else:
                         H2.append(hap_list)
@@ -943,7 +919,7 @@ class Imputation(object):
 
     def comp_hap_prob_plan_b(self, Hap,division,missing):
         if division[0] == list(set(self.index_dict.values())):#[1, 2, 3, 4, 5]:
-            return self.comp_hap_prob(Hap[0], 0, 0, 0)
+            return self.comp_hap_prob([Hap[0]], 0, 0, 0)
         haplo_probs = self.find_option_freq(division, Hap,missing)
 
         # Return {'Haps': haplos, 'Probs': probs} of the dict
@@ -1318,17 +1294,20 @@ class Imputation(object):
             type_list.append(self.index_dict[locus])
         return type_list
 
+    def open_ambiguities(self, hap, loc, split_loc):
+        return open_ambiguities(hap, loc, split_loc)
+
     def comp_cand(self, gl_string, binary, epsilon, n, MUUG_output, haps_output, planb, em):
         # receives a list of phases and computes haps and
         # probabilties and accumulate cartesian productEpsilon=0.0001
         chr = self.gl2haps(gl_string)
         if chr == []:
-            return
+            return None, None
         # if we in 9-loci, check if the type input in valid format
         if self.nodes_for_plan_A:
             geno_type = self.input_type(chr['Genotype'][0])
             if not geno_type in self.nodes_for_plan_A:
-                return
+                return None, None
 
         n_loci = chr['N_Loc']
 
@@ -1337,7 +1316,7 @@ class Imputation(object):
 
         # return if the result is empty (why would that be?)
         if pmags == []:
-            return
+            return None, None
 
         #res_muugs = {'Haps': 'NaN', 'Probs': 0}
         res_muugs = {'MaxProb': 0, 'Haps': {}, 'Pops': {}}
@@ -1363,7 +1342,7 @@ class Imputation(object):
 
         if phases:
             if MUUG_output:
-                prior_matrix_orig = copy.deepcopy(self.priorMatrix)
+                prior_matrix_orig = np.array(self.priorMatrix, order='K', copy=True) #copy.deepcopy(self.priorMatrix)
                 res_muugs = self.call_comp_phase_prob(epsilon, n, phases, chr, True, planb)
                 if planb and len(res_muugs['Haps']) == 0:
                     self.plan = 'c'
@@ -1420,23 +1399,19 @@ class Imputation(object):
         # no plan b
         for level in range(2):
             if level == 1:
-                if self.unk_priors == "MR":
-                    self.priorMatrix = np.ones((len(self.populations), len(self.populations)))
-                else:
-                    self.priorMatrix = np.identity(len(self.populations))
-                #self.priorMatrix = np.ones((len(self.populations), len(self.populations)))  ####
+                self.priorMatrix = np.ones((len(self.populations), len(self.populations)))  ####
             if planb and len(res['Haps']) == 0:
                 self.plan = 'b'
                 epsilon = 1e-14
                 n_res = 0
                 min_res = 10
                 min_epsilon = 1.e-3
-                #self.priorMatrix = np.ones((len(self.populations), len(self.populations)))
+                # self.priorMatrix = np.ones((len(self.populations), len(self.populations)))
                 while (epsilon > 0) & (n_res < min_res):
                     epsilon /= 10
                     if (epsilon < min_epsilon):
                         epsilon = 0.0
-                    phases_planb = copy.deepcopy(phases)
+                    phases_planb = deepcopy_list(phases)
                     # Find the option according to plan b
                     if MUUG_output:
                         res = self.comp_phase_prob_plan_b(phases_planb, chr['N_Loc'], epsilon, True)
@@ -1683,7 +1658,7 @@ class Imputation(object):
 
         with f as lines:
             for (i, name_gl) in enumerate(lines):
-                #try:
+                try:
                     name_gl = name_gl.rstrip()  # remove trailing whitespace
                     if ',' in name_gl:
                         list_gl = name_gl.split(',')
@@ -1746,9 +1721,10 @@ class Imputation(object):
                     print(time_taken)
                     if self.verbose:
                         self.logger.info("Time taken: " + str(time_taken))
-                    """except:
-                        problem.write(str(name_gl) + "\n")
-                        continue"""
+                except:
+                    print(f"{i} Subject: {subject_id} - Exception")
+                    problem.write(str(name_gl) + "\n")
+                    continue
 
             f.close()
             if MUUG_output:

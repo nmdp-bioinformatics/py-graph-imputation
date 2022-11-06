@@ -77,7 +77,7 @@ def run_impute(conf_file = "../conf/minimal-configuration.json", project_dir_gra
     print("Performing imputation based on:")
     print("\tPopulation: {}".format(config["pops"]))
     print("\tPriority: {}".format(config["priority"]))
-    print("\tPriority: {}".format(config["UNK_priors"]))
+    print("\tUNK priority: {}".format(config["UNK_priors"]))
     print("\tEpsilon: {}".format(config["epsilon"]))
     print("\tPlan B: {}".format(config["planb"]))
     print("\tNumber of Results: {}".format(config["number_of_results"]))

@@ -26,7 +26,16 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import setup
+from Cython.Build import cythonize
+# import numpy
+
+
+      # include_dirs=[numpy.get_include()],
+      # requires=['numpy', 'Cython'])
+
+
+from setuptools import setup, find_packages, Extension
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -67,4 +76,5 @@ setup(
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
     zip_safe=False,
+    ext_modules=cythonize([Extension("grim/imputation/imputegl/cutils", ["grim/imputation/imputegl/cutils.pyx"])])
 )
