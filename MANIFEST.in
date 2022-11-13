@@ -2,5 +2,6 @@ include requirements.txt
 include README.md
 include LICENSE
 include *.txt
-recursive-include src *.py
-recursive-include src *.txt
+recursive-include grim *.py
+recursive-include grim *.txt
+recursive-include grim *.json
