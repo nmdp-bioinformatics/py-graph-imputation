@@ -5,3 +5,4 @@ include *.txt
 recursive-include grim *.py
 recursive-include grim *.txt
 recursive-include grim *.json
+recursive-include grim *.pyx
