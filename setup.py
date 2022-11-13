@@ -77,6 +77,7 @@ setup(
             "grim.imputation.imputegl",
             "grim.imputation.graph_generation",
             "grim.validation",
+            "grim.conf",
         ]),
     test_suite="tests",
     tests_require=test_requirements,

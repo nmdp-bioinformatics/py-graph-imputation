@@ -18,8 +18,6 @@
 #    > http://www.fsf.org/licensing/licenses/lgpl.html
 #    > http://www.opensource.org/licenses/lgpl-license.php
 #
-from __future__ import absolute_import
-from .impute import Imputation
 
 
 __author__ = """Martin Maiers"""
