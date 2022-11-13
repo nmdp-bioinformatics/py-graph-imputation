@@ -51,7 +51,7 @@ with open("requirements-tests.txt") as requirements_file:
 
 setup(
     name="py-graph-imputation",
-    version="0.0.7",
+    version="0.0.6",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
@@ -83,5 +83,5 @@ setup(
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
     zip_safe=False,
-    ext_modules=cythonize([Extension("cutils", ["grim/imputation/imputegl/cutils.pyx"])], language_level="3")
+    ext_modules=cythonize([Extension("grim.imputation.imputegl.cutils", ["grim/imputation/imputegl/cutils.pyx"])], language_level="3")
 )
