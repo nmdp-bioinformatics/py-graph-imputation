@@ -9,7 +9,14 @@ def missing(labelA, labelB):
 
 
 class Graph(object):
-    __slots__ = 'graph', 'labelDict', 'whole_graph', 'full_loci', 'nodes_plan_a', 'nodes_plan_b'
+    __slots__ = (
+        "graph",
+        "labelDict",
+        "whole_graph",
+        "full_loci",
+        "nodes_plan_a",
+        "nodes_plan_b",
+    )
 
     def __init__(self, config):
         self.graph = nx.DiGraph()
