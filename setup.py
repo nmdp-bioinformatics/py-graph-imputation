@@ -28,11 +28,12 @@
 
 from setuptools import setup
 from Cython.Build import cythonize
+
 # import numpy
 
 
-      # include_dirs=[numpy.get_include()],
-      # requires=['numpy', 'Cython'])
+# include_dirs=[numpy.get_include()],
+# requires=['numpy', 'Cython'])
 
 
 from setuptools import setup, find_packages, Extension
@@ -71,17 +72,27 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="grim",
-    packages=find_packages(include=[
+    packages=find_packages(
+        include=[
             "grim",
             "grim.imputation",
             "grim.imputation.imputegl",
             "grim.imputation.graph_generation",
             "grim.validation",
             "grim.conf",
-        ]),
+        ]
+    ),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
     zip_safe=False,
-    ext_modules=cythonize([Extension("grim.imputation.imputegl.cutils", ["grim/imputation/imputegl/cutils.pyx"])], language_level="3")
+    ext_modules=cythonize(
+        [
+            Extension(
+                "grim.imputation.imputegl.cutils",
+                ["grim/imputation/imputegl/cutils.pyx"],
+            )
+        ],
+        language_level="3",
+    ),
 )
