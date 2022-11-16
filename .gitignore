@@ -134,3 +134,6 @@ dmypy.json
 # behave
 pretty.output
 allure_report/
+
+# cython temp files
+grim/**/*.c

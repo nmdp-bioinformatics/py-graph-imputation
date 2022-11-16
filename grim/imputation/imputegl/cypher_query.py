@@ -5,24 +5,23 @@ from typing import Dict
 
 
 class CypherQuery(object):
-    '''
+    """
     classdocs
-    '''
+    """
 
-    def __init__(self, loc_map, verbose: bool=False):
-        '''
+    def __init__(self, loc_map, verbose: bool = False):
+        """
         Constructor
-        '''
+        """
         self.verbose = verbose
         self.logger = logging.getLogger("Logger." + __name__)
-        #haplo = "A*02:01~C*03:03~B*15:01~DRB1*11:01~DQB1*03:01"
+        # haplo = "A*02:01~C*03:03~B*15:01~DRB1*11:01~DQB1*03:01"
         self.loc_map = loc_map
         for locus, val in self.loc_map.items():
             self.loc_map[locus] = str(val)
 
     def getLocus(self, allele):
-        """ Get the locus back from any given allele
-        """
+        """Get the locus back from any given allele"""
         loc_allele = allele.split("*")
         return self.loc_map[loc_allele[0]]
 

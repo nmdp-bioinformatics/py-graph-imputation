@@ -1,4 +1,4 @@
-'''
+"""
 The WMDA data is part of the supplemental materials from the following
 article.
 
@@ -14,24 +14,24 @@ It is distributed under a Creative Commons Attribution‐NonCommercial‐NoDeriv
 (CC BY-NC-ND 4.0) license.
 
 https://creativecommons.org/licenses/by-nc-nd/4.0/
-'''
+"""
 
 import os.path
 import urllib.request
 from tarfile import TarFile
 
-url='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089599/bin/TAN-87-439-s006.tgz'
-file_name='TAN-87-439-s006.tgz'
+url = "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5089599/bin/TAN-87-439-s006.tgz"
+file_name = "TAN-87-439-s006.tgz"
 
 # download file
 if os.path.isfile(file_name):
-    print('Skipping download step.  File found: ', file_name)
+    print("Skipping download step.  File found: ", file_name)
 else:
-    print('Downloading file', file_name, '...')
+    print("Downloading file", file_name, "...")
     urllib.request.urlretrieve(url, file_name)
 
 # unpack it
-print('Unpacking file ...')
+print("Unpacking file ...")
 TarFile.open(file_name).extractall(path="./data/wmda")
 
-print('Done.')
+print("Done.")
