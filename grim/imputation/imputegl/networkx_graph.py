@@ -18,7 +18,7 @@ class Graph(object):
         self.full_loci = config["full_loci"]
         self.nodes_plan_a, self.nodes_plan_b = [], []
         if config["nodes_for_plan_A"]:
-            path = '/'.join(config["node_file"].split('/')[:-1])
+            path = ("/").join(config["node_file"].split("/")[:-1])
 
             # bug: dies if file doesn't exist
             # bug: list_f doesn't exist

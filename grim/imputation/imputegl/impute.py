@@ -119,12 +119,7 @@ def clean_up_gl(gl):
 
 
 class Imputation(object):
-    __slots__ = 'logger', 'verbose', 'populations', 'netGraph', 'priorMatrix', 'full_hapl', 'index_dict', 'full_loci', \
-                'factor', '_factor_missing_data', 'cypher', 'cypher_plan_b', 'matrix_planb', 'count_by_prob', \
-                'number_of_options_threshold', 'plan', 'option_1', 'option_2', \
-                'haplotypes_number_in_phase', 'save_space_mode', 'nodes_for_plan_A', 'unk_priors'
-
-    def __init__(self, net=None,config=None,  count_by_prob=None, verbose=False):
+    def __init__(self, net=None, config=None, count_by_prob=None, verbose=False):
         """Constructor
         Intialize an instance of `Imputation` with a py2neo graph
         and a `CypherQuery` object.
