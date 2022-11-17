@@ -243,16 +243,10 @@ def generate_graph(
         pops = em_pop
     freq_trim = conf.get("freq_trim_threshold")
 
-    freq_file = conf.get("freq_file", "default")
-    if freq_file == "default":
-        freq_file = os.path.dirname(os.path.realpath(__file__)) + "/output/hpf.csv"
+    freq_file = conf.get("freq_file")
     dict_count_of_pop = {}
 
-    pop_ratio_dir = conf.get(
-        "pops_count_file",
-        os.path.dirname(os.path.realpath(__file__))
-        + "/imputation/graph_generation/output/pop_ratio.txt",
-    )
+    pop_ratio_dir = conf.get("pops_count_file")
     path = pathlib.Path(pop_ratio_dir)
 
     if em or not path.is_file():

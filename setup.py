@@ -89,8 +89,8 @@ setup(
     ext_modules=cythonize(
         [
             Extension(
-                "grim.imputation.imputegl.cutils",
-                ["grim/imputation/imputegl/cutils.pyx"],
+                "grim.imputation.cutils",
+                ["grim/imputation/cutils.pyx"],
             )
         ],
         language_level="3",

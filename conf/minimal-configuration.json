@@ -1,7 +1,6 @@
 {
   "populations": [
-    "FILII",
-      "NAMER"
+    "CAU"
   ],
   "freq_trim_threshold": 1e-5,
  "priority": {
@@ -37,12 +36,15 @@
   "number_of_pop_results": 100,
   "output_MUUG": true,
   "output_haplotypes": true,
-  "graph_files_path": "output/csv" ,
+  "freq_data_dir": "data/freqs" ,
+  "pops_count_file": "graph_generation/output/pop_ratio.txt" ,
+  "freq_file": "graph_generation/output/hpf.csv" ,
+  "graph_files_path": "graph_generation/output/csv/" ,
   "node_csv_file": "nodes.csv",
   "edges_csv_file": "edges.csv",
   "info_node_csv_file": "info_node.csv",
   "top_links_csv_file": "top_links.csv",
-  "imputation_in_file": "validation/simulation/data/simulated_donor.csv",
+  "imputation_in_file": "data/subjects/donor.csv",
   "imputation_out_umug_freq_filename": "don.umug",
   "imputation_out_umug_pops_filename": "don.umug.pops",
   "imputation_out_hap_freq_filename": "don.pmug",
