@@ -72,6 +72,7 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="grim",
+    scripts=["scripts/build-imputation-validation.sh", "scripts/runfile.py"],
     packages=find_packages(
         include=[
             "grim",
