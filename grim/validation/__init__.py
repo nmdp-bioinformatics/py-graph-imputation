@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 
 #
-#    grim Graph Imputation
-#    Copyright (c) 2021 Be The Match operated by National Marrow Donor Program. All Rights Reserved.
-#
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Lesser General Public License as published
 #    by the Free Software Foundation; either version 3 of the License, or (at
 #    your option) any later version.
 #
 #    This library is distributed in the hope that it will be useful, but WITHOUT
-#    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#    ANY WARRANTY; with out even the implied warranty of MERCHANTABILITY or
 #    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
 #    License for more details.
 #
@@ -23,6 +20,6 @@
 #
 
 
-"""Top-level package for py-grim."""
-
-__organization__ = "NMDP/CIBMTR Bioinformatics"
+__author__ = """Martin Maiers"""
+__email__ = "mmaiers@nmdp.org"
+__version__ = "0.0.7"

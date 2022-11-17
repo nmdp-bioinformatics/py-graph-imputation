@@ -7,8 +7,9 @@ from collections import defaultdict
 import os.path
 import json
 
-import numpy as np
 
+import numpy as np
+from .cutils import open_ambiguities, create_hap_list, deepcopy_list
 from .cypher_plan_b import CypherQueryPlanB
 from .cypher_query import CypherQuery
 
@@ -118,6 +119,31 @@ def clean_up_gl(gl):
 
 
 class Imputation(object):
+    __slots__ = (
+        "logger",
+        "verbose",
+        "populations",
+        "netGraph",
+        "priorMatrix",
+        "full_hapl",
+        "index_dict",
+        "full_loci",
+        "factor",
+        "_factor_missing_data",
+        "cypher",
+        "cypher_plan_b",
+        "matrix_planb",
+        "count_by_prob",
+        "number_of_options_threshold",
+        "plan",
+        "option_1",
+        "option_2",
+        "haplotypes_number_in_phase",
+        "save_space_mode",
+        "nodes_for_plan_A",
+        "unk_priors",
+    )
+
     def __init__(self, net=None, config=None, count_by_prob=None, verbose=False):
         """Constructor
         Intialize an instance of `Imputation` with a py2neo graph
@@ -914,8 +940,8 @@ class Imputation(object):
             fq = []
 
             for k in range(2):
-                hap_list = []
-                hap_list.append(haps[j][k])
+                hap_list = [haps[j][k]]
+                hap_list_splits = [tuple(allele.split("/")) for allele in hap_list[0]]
 
                 # compute the number of options:
                 options = 1
@@ -1590,12 +1616,12 @@ class Imputation(object):
         # probabilties and accumulate cartesian productEpsilon=0.0001
         chr = self.gl2haps(gl_string)
         if chr == []:
-            return
+            return None, None
         # if we in 9-loci, check if the type input in valid format
         if self.nodes_for_plan_A:
             geno_type = self.input_type(chr["Genotype"][0])
             if not geno_type in self.nodes_for_plan_A:
-                return
+                return None, None
 
         n_loci = chr["N_Loc"]
 
@@ -1604,7 +1630,7 @@ class Imputation(object):
 
         # return if the result is empty (why would that be?)
         if pmags == []:
-            return
+            return None, None
 
         # res_muugs = {'Haps': 'NaN', 'Probs': 0}
         res_muugs = {"MaxProb": 0, "Haps": {}, "Pops": {}}
@@ -1713,7 +1739,7 @@ class Imputation(object):
                     epsilon /= 10
                     if epsilon < min_epsilon:
                         epsilon = 0.0
-                    phases_planb = copy.deepcopy(phases)
+                    phases_planb = deepcopy_list(phases)
                     # Find the option according to plan b
                     if MUUG_output:
                         res = self.comp_phase_prob_plan_b(

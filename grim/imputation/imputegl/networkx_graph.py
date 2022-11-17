@@ -9,10 +9,19 @@ def missing(labelA, labelB):
 
 
 class Graph(object):
+    __slots__ = (
+        "graph",
+        "labelDict",
+        "whole_graph",
+        "full_loci",
+        "nodes_plan_a",
+        "nodes_plan_b",
+    )
+
     def __init__(self, config):
-        self.graph = nx.Graph()
+        self.graph = nx.DiGraph()
         self.labelDict = {}
-        self.whole_graph = nx.Graph()
+        self.whole_graph = nx.DiGraph()
         self.full_loci = config["full_loci"]
         self.nodes_plan_a, self.nodes_plan_b = [], []
         if config["nodes_for_plan_A"]:
@@ -63,8 +72,11 @@ class Graph(object):
                 if len(row) > 0:
                     node1 = nodesDict[row[0]]
                     node2 = nodesDict[row[1]]
-                    if node1 in self.graph.nodes() and node2 in self.graph.nodes():
-                        self.graph.add_edge(node1, node2)
+                    if node1 in self.graph and node2 in self.graph:
+                        if self.graph.nodes[node1]["label"] == self.full_loci:
+                            self.graph.add_edge(node2, node1)
+                        else:
+                            self.graph.add_edge(node1, node2)
 
         edgesfile.close()
 
@@ -88,7 +100,6 @@ class Graph(object):
                     self.whole_graph.add_edge(node1, node2, color=kind)
 
         allEdgesfile.close()
-
         nodesDict.clear()
 
     # return all haplotype by specific label

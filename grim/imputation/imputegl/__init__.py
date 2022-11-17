@@ -24,4 +24,4 @@ from .impute import Imputation
 
 __author__ = """Martin Maiers"""
 __email__ = "mmaiers@nmdp.org"
-__version__ = "0.0.4"
+__version__ = "0.0.7"

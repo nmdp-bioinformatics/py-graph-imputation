@@ -26,7 +26,17 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import setup
+from Cython.Build import cythonize
+
+# import numpy
+
+
+# include_dirs=[numpy.get_include()],
+# requires=['numpy', 'Cython'])
+
+
+from setuptools import setup, find_packages, Extension
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -42,7 +52,7 @@ with open("requirements-tests.txt") as requirements_file:
 
 setup(
     name="py-graph-imputation",
-    version="0.0.6",
+    version="0.0.7",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
@@ -66,13 +76,23 @@ setup(
         include=[
             "grim",
             "grim.imputation",
-            "grim.imputegl",
+            "grim.imputation.imputegl",
             "grim.imputation.graph_generation",
             "grim.validation",
+            "grim.conf",
         ]
     ),
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/nmdp-bioinformatics/py-grim",
     zip_safe=False,
+    ext_modules=cythonize(
+        [
+            Extension(
+                "grim.imputation.imputegl.cutils",
+                ["grim/imputation/imputegl/cutils.pyx"],
+            )
+        ],
+        language_level="3",
+    ),
 )

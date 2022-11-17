@@ -23,6 +23,6 @@
 #
 
 
-"""Top-level package for py-grim."""
-
-__organization__ = "NMDP/CIBMTR Bioinformatics"
+__author__ = """Martin Maiers"""
+__email__ = "mmaiers@nmdp.org"
+__version__ = "0.0.7"

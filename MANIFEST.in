@@ -1,0 +1,9 @@
+include requirements.txt
+include README.md
+include LICENSE
+include *.txt
+recursive-include grim *.py
+recursive-include grim *.txt
+recursive-include grim *.json
+recursive-include grim *.pyx
+recursive-include grim *.pyd
