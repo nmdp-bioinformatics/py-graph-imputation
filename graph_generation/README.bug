@@ -21,4 +21,3 @@ $ cut -f1,2 -d',' output/csv/nemo/edges.csv |sort |uniq -c |sort -rn |more
  539 117913,117365
  539 117884,117365
  515 117918,117370
-

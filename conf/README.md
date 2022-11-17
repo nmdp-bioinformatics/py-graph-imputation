@@ -4,8 +4,8 @@
 | --- | --- |
 | populations | The population to consider them frequencies. |
 | priority | The coefficient values that define the priority matrix. |
-| loci_map| Loci full name Mapping for indexes. | 
-| freq_trim_threshold | The numerator in the frequency threshold. | 
+| loci_map| Loci full name Mapping for indexes. |
+| freq_trim_threshold | The numerator in the frequency threshold. |
 | factor_missing_data | factor to haplotype frequency in plan B in missing data case |
 | Plan_B_Matrix | matrix arranged by the most probable possibilities for recombination. The first element in the matrix should be the full haplotype. the indexes are corresponding to loci_map|
 | planb| True - use plan B anc C. False - use only Plan A. |

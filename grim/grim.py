@@ -26,8 +26,8 @@
 from .validation import runfile
 from .imputation.graph_generation import generate_neo4j_multi_hpf
 
-from .imputation.imputegl import Imputation
-from .imputation.imputegl.networkx_graph import Graph
+from .imputation.impute import Imputation
+from .imputation.networkx_graph import Graph
 import os
 
 

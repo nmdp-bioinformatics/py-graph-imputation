@@ -14,4 +14,3 @@ I used this one (**) as the single method to rule them all.
 It generate multiple CP links between nodes (with different values).
 This makes the graph traversal ambiguous.
 Not good.
-

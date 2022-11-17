@@ -13,25 +13,25 @@
 		```
 
 - Python 3
-	- On MacOS install with 
+	- On MacOS install with
 		```
 		brew install python3
 		```
 
 - Install Neo4J
-	- On MacOS install with 
+	- On MacOS install with
 		```
 		brew install neo4j
 		```
 
 	- Setup NEO4J_HOME
-    
+
         Point NEO4J_HOME to the root of the NEO4J directory.
 		```
 		export NEO4J_HOME=/usr/local/Cellar/neo4j/3.2.2/libexec
 		```
 
-### Linux 
+### Linux
 - JDK 8
 	- Install JDK 1.8 from Oracle
 	- add JAVA_HOME to ~/.bash_profile
@@ -51,11 +51,11 @@
         ```
 
 	- Point NEO4J_HOME to the root of the uncompressed NEO4J directory and add the following line to ~/.bash_profile
-    
+
 		```
 		export NEO4J_HOME=path/to/neo4j-community-3.5.7
 		```
-        
+
 
 
 # Using Makefile
@@ -99,12 +99,12 @@ make nemo
 
 To use a different set of frequencies use the following procedure:
 
-- Starting in the graph generator directory, convert the data from frequency format to hpf (haplotype, population, frequency).  
-``` 
-   python nemo_to_hpf_csv.py 
+- Starting in the graph generator directory, convert the data from frequency format to hpf (haplotype, population, frequency).
+```
+   python nemo_to_hpf_csv.py
 ```
 
-- This program looks for a data/NEMO2011 directory and reads the individual frequency files and generates this csv: 
+- This program looks for a data/NEMO2011 directory and reads the individual frequency files and generates this csv:
 ```
     output/hpf.csv
 ```
@@ -120,4 +120,3 @@ To use a different set of frequencies use the following procedure:
 	└── top_links.csv
 ```
     Note: there is an option to trim the frequency set below a frequency threshold.  If the trimming threshold is 1e-6 it will take 9m35s to generate the graph csv files on a mid-2015 MacBook Pro (2.5 GHz Intel Core i7) and will result in 1,088,817 nodes (159MB), 14,868,976 edges (2.0GB)and 5,947,591 top links (108MB).
-
