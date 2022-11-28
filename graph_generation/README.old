@@ -1,0 +1,16 @@
+
+there are 6 python scripts in graph_generator
+
+wmda_to_hpf_csv.py - convert wmda frequencies to hpf (GRIMM)
+generate_neo4j_wmda_hpf.py - genreate graph csvs  (GRIMM)
+nemo_to_hpf_csv.py - convert nemo frequencies to hpf
+generate_Neo4J_multi.py - create mutli graph from frequencies files
+** generate_neo4j_hpf.py - same but reads hpf file
+generate_neo4J_load_files.py - early code based on jupyter notebook
+
+
+
+I used this one (**) as the single method to rule them all.
+It generate multiple CP links between nodes (with different values).
+This makes the graph traversal ambiguous.
+Not good.

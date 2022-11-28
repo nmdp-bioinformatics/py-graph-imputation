@@ -116,6 +116,7 @@ venv.bak/
 .spyproject
 .idea
 .vscode
+*.swp
 
 # Rope project settings
 .ropeproject
@@ -137,3 +138,5 @@ allure_report/
 
 # cython temp files
 grim/**/*.c
+
+output/
