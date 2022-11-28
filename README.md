@@ -82,3 +82,59 @@ How to develop on the project locally.
 10. Use `python app.py` to run the Flask service app in debug mode. Service will be available at http://localhost:8080/
 11. Use `make docker-build` to build a docker image using the current `Dockerfile`.
 12. `make docker` will build and run the docker image with the service.  Service will be available at http://localhost:8080/
+
+
+# Runing a minimal configuration example
+
+From the main directory of the repo run:
+```
+scripts//build-imputation-validation.sh
+```
+
+This will pepare and load frequency data into the graph and run imputation on a sample set of subjects.
+
+The execution is driven by the configuration file:
+`conf/minimal-configuration.json`
+
+It takes input from this file:
+```
+data/subjects/donor.csv
+```
+
+
+And genrates an `output` directory with these contents:
+
+```
+output
+├── don.miss
+├── don.pmug
+├── don.pmug.pops
+├── don.problem
+├── don.umug
+└── don.umug.pops
+```
+
+The .miss and .problem files are cases contain cases that failed due to errors.
+
+The .pmug file contains the Phased Multi-locus Unambiguous Genotypes.
+
+The .umug file contains the Unphased Multi-locus Unambiguous Genotypes.
+
+
+The format of both files is (csv):
+
+* id
+* genotype - in glstring format
+* frequency
+* rank
+
+
+The .pmug.pops and .umug.pops contain the corresponding population assignments.
+
+The format of the .pops files is (csv):
+
+* id
+* pop1
+* pop2
+* frequency
+* rank
