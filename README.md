@@ -114,7 +114,9 @@ output
 └── don.umug.pops
 ```
 
-The .miss and .problem files are cases contain cases that failed due to errors.
+The .problem file contains cases that failed due to serious errors (e.g., invalid HLA).
+
+The .miss file contains cases where there was no output possible given the input, frequencies and configuration options.
 
 The .pmug file contains the Phased Multi-locus Unambiguous Genotypes.
 
