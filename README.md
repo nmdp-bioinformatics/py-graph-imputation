@@ -121,7 +121,7 @@ The .pmug file contains the Phased Multi-locus Unambiguous Genotypes.
 The .umug file contains the Unphased Multi-locus Unambiguous Genotypes.
 
 
-The format of both files is:
+The format of both files is (csv):
 
 * id
 * genotype - in glstring format
@@ -131,7 +131,7 @@ The format of both files is:
 
 The .pmug.pops and .umug.pops contain the corresponding population assignments.
 
-The format of the .pops files is:
+The format of the .pops files is (csv):
 
 * id
 * pop1
