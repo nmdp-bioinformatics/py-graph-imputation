@@ -90,9 +90,9 @@ docker: docker-build ## build a docker image and run the service
 
 install: clean ## install the package to the active Python's site-packages
 	pip install --upgrade pip
-	python3 setup.py build_ext --inplace
-	python setup.py install
 	pip install -r requirements.txt
+	python setup.py build_ext --inplace
+	python setup.py install
 	pip install -r requirements-tests.txt
 	pip install -r requirements-dev.txt
 	pip install -r requirements-deploy.txt

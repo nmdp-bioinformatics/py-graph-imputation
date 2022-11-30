@@ -1,12 +1,17 @@
 # py-graph-imputation
 [![PyPi Version](https://img.shields.io/pypi/v/py-graph-imputation.svg)](https://pypi.python.org/pypi/py-graph-imputation)
 
-## Graph Imputation
+* [Graph Imputation](#graph-imputation)
+* [Development](#develop)
+* [Running A Minimal Example Imputation](#running-a-minimal-configuration-example)
+
+### Graph Imputation
 
 `py-graph-imputation` is the successor of [GRIMM](https://github.com/nmdp-bioinformatics/grimm) written in Python and based on [NetworkX](https://networkx.org/)
 
 ![GRIM Dependencies](images/py-graph-imputation.png)
 
+### Development
 How to develop on the project locally.
 
 1. Make sure the following pre-requites are installed.
@@ -53,56 +58,43 @@ How to develop on the project locally.
    ```shell
     make install
    ```
-7. The Gherkin Feature files, step files and pytest files go in `tests` directory:
-    ```
-    tests
-    |-- features
-    |   |-- algorithm
-    |   |   `-- SLUG\ Match.feature
-    |   `-- definition
-    |       `-- Class\ I\ HLA\ Alleles.feature
-    |-- steps
-    |   |-- HLA_alleles.py
-    |   `-- SLUG_match.py
-    `-- unit
-        `-- test_grim.py
-    ```
-8. Package Module files go in the `grim` directory.
+7. Package Module files go in the `grim` directory.
     ```
     grim
     |-- __init__.py
-    |-- algorithm
-    |   `-- match.py
-    |-- model
-    |   |-- allele.py
-    |   `-- slug.py
-    `-- grim.py
+    |-- grim.py
+    `-- imputation
+        |-- __init__.py
+        |-- cutils.pyx
+        |-- cypher_plan_b.py
+        |-- cypher_query.py
+        |-- impute.py
+        `-- networkx_graph.py
     ```
-9. Run all tests with `make test` or different tests with `make behave` or `make pytest`. `make behave` will generate report files and open the browser to the report.
+8. Run all tests with `make test` or different tests with `make behave` or `make pytest`.
+9. Run `make lint` to run the linter and black formatter.
 10. Use `python app.py` to run the Flask service app in debug mode. Service will be available at http://localhost:8080/
 11. Use `make docker-build` to build a docker image using the current `Dockerfile`.
 12. `make docker` will build and run the docker image with the service.  Service will be available at http://localhost:8080/
 
 
-# Runing a minimal configuration example
+### Running a minimal configuration example
 
 From the main directory of the repo run:
 ```
-scripts//build-imputation-validation.sh
+scripts/build-imputation-validation.sh
 ```
 
-This will pepare and load frequency data into the graph and run imputation on a sample set of subjects.
+This will prepare and load frequency data into the graph and run imputation on a sample set of subjects.
 
-The execution is driven by the configuration file:
-`conf/minimal-configuration.json`
+The execution is driven by the configuration file: `conf/minimal-configuration.json`
 
 It takes input from this file:
 ```
 data/subjects/donor.csv
 ```
 
-
-And genrates an `output` directory with these contents:
+And generates an `output` directory with these contents:
 
 ```
 output
@@ -114,13 +106,13 @@ output
 └── don.umug.pops
 ```
 
-The .problem file contains cases that failed due to serious errors (e.g., invalid HLA).
+The `.problem` file contains cases that failed due to serious errors (e.g., invalid HLA).
 
-The .miss file contains cases where there was no output possible given the input, frequencies and configuration options.
+The `.miss` file contains cases where there was no output possible given the input, frequencies and configuration options.
 
-The .pmug file contains the Phased Multi-locus Unambiguous Genotypes.
+The `.pmug` file contains the Phased Multi-locus Unambiguous Genotypes.
 
-The .umug file contains the Unphased Multi-locus Unambiguous Genotypes.
+The `.umug` file contains the Un-phased Multi-locus Unambiguous Genotypes.
 
 
 The format of both files is (csv):
@@ -131,9 +123,9 @@ The format of both files is (csv):
 * rank
 
 
-The .pmug.pops and .umug.pops contain the corresponding population assignments.
+The `.pmug.pops` and `.umug.pops` contain the corresponding population assignments.
 
-The format of the .pops files is (csv):
+The format of the `.pops` files is (csv):
 
 * id
 * pop1
