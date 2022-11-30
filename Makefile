@@ -79,7 +79,6 @@ coverage: ## check code coverage quickly with the default Python
 
 dist: clean ## builds source and wheel package
 	python setup.py sdist
-	python setup.py bdist_wheel
 	ls -l dist
 
 docker-build: ## build a docker image for the service
