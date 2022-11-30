@@ -302,7 +302,7 @@ class Imputation(object):
 
         return Phases
 
-    def open_gl_string(self, gl_string):
+    def open_gl_string(self, gl_string, cutoff):
         # receives a list of phases and computes haps and
         # probabilties and accumulate cartesian productEpsilon=0.0001
         chr = self.gl2haps(gl_string)
@@ -310,36 +310,35 @@ class Imputation(object):
             return
 
         # generate the 2^(N-1) phases
-        chr1 = self.gen_phases(chr["Genotype"], chr["N_Loc"])
+        chr1 = self.gen_phases(chr["Genotype"], chr["N_Loc"], None)
 
         # return if the result is empty (why would that be?)
         if chr1 == []:
             return
 
-        phases = self.open_phases_1(chr1, chr["N_Loc"], gl_string)
+        phases = self.open_phases_for_em(chr1, chr["N_Loc"], cutoff)
         return phases
 
-    def open_phases_1(self, haps, N_Loc, gl_string):
+    def open_phases_for_em(self, haps, N_Loc, cutoff):
         phases = []
         for j in range(len(haps)):
             H1 = []
             H2 = []
-            ##  fq = pa.DataFrame()
-            fq = []
 
             for k in range(2):
-                hap_list = []
-                hap_list.append(haps[j][k])
-
+                hap_list = [haps[j][k]]
+                hap_list_splits = [tuple(allele.split("/")) for allele in hap_list[0]]
                 # compute the number of options:
                 options = 1
                 for i in range(N_Loc):
-                    options = options * (len(hap_list[0][i].split("/")))
+                    options *= len(hap_list_splits[i])
 
                 # if the number of options is smaller than the total number of nodes:
-                if options < 100:  # open ambiguities regularly:
+                if options < cutoff:  # open ambiguities regularly:
                     for i in range(N_Loc):
-                        hap_list = self.open_ambiguities(hap_list, i)
+                        hap_list = self.open_ambiguities(
+                            hap_list, i, hap_list_splits[i]
+                        )
                     if k == 0:
                         H1.append(hap_list)
                     else:
@@ -350,24 +349,6 @@ class Imputation(object):
             if H1 and H2:
                 phases.append([H1, H2])
         return phases
-
-    def open_ambiguities(self, hap, loc):
-        # This opens all allele ambiguities
-        hap_new = []  # produces an empty list of haplotypes
-        for k in range(len(hap)):  # slit a given locus in all haps.
-            splitHap = hap[k][loc].split("/")
-            if splitHap == hap[k][loc].split():
-                split_loc = hap[k][loc].split("|")
-            else:
-                split_loc = splitHap
-            hap1 = hap[k]
-            if len(split_loc) > 1:
-                for i in range(len(split_loc)):
-                    hap1[loc] = split_loc[i]
-                    hap_new.append(hap1[:])
-            else:
-                hap_new.append(hap1[:])
-        return hap_new
 
     def comp_hap_prob(self, Hap, N_Loc, epsilon, n):
         haplo_probs = self.get_haplo_freqs(Hap, epsilon, n)
@@ -410,7 +391,7 @@ class Imputation(object):
     #     return haplo_probs
 
     def get_haplo_freqs(self, haplos, epsilon, n=25000):
-        haplos_joined = ["~".join(item) for sublist in haplos for item in sublist]  ###
+        haplos_joined = ["~".join(item) for item in haplos[0]]  ###
         # haplos_joined = [item for sublist in haplos for item in sublist]  ###
         # haplos_joined = ["~".join(sorted(item)) for sublist in haplos for item in sublist]
         return self.netGraph.adjs_query(haplos_joined)
@@ -895,8 +876,7 @@ class Imputation(object):
                             gen = g.split("/")
                             probs = self.check_if_alleles_exist(gen)
                             if not probs == {}:
-                                list(probs.keys())
-                                haps[j][k][i] = ("/").join(list(probs.keys()))
+                                haps[j][k][i] = "/".join(list(probs.keys()))
 
     def reduce_phase_to_commons_alleles(
         self, haps, N_Loc, commons_number=1, planc=False
@@ -946,13 +926,16 @@ class Imputation(object):
                 # compute the number of options:
                 options = 1
                 for i in range(N_Loc):
-                    options = options * (len(hap_list[0][i].split("/")))
+                    options *= len(hap_list_splits[i])
 
                 # if the number of options is smaller than the total number of nodes:
                 if options < self.number_of_options_threshold:
                     # open ambiguities regularly:
                     for i in range(N_Loc):
-                        hap_list = self.open_ambiguities(hap_list, i)
+                        hap_list = self.open_ambiguities(
+                            hap_list, i, hap_list_splits[i]
+                        )
+
                     if k == 0:
                         H1.append(hap_list)
                     else:
@@ -963,21 +946,21 @@ class Imputation(object):
                 # if there are more options than actual haplotypes possible:
                 else:
                     self.option_2 += 1
-                    optionDict = {}
+                    optionDict = {}  # set()
                     if len(fq) == 0:
-                        list = []
+                        _list = []
                         for (gen, name) in self.cypher.loc_map.items():
                             count = 0
                             for i in range(len(hap_list[0])):
-                                if hap_list[0][i].split("*")[0] == gen:
+                                if hap_list[0][i].split("*", 1)[0] == gen:
                                     count = count + 1
                             if count > 0:
-                                list.append(name)
+                                _list.append(name)
                         # we'll get all the options possible
-                        # (query,lc)=self.cypher.buildQuery(["~".join(list)])
+                        # (query,lc)=self.cypher.buildQuery(["~".join(_list)])
 
                         # fq = pa.DataFrame(self.graph.data(query))
-                        label = "".join(sorted(list))
+                        label = "".join(sorted(_list))
                         fq = self.netGraph.haps_by_label(label)
                         # fq = pa.DataFrame(self.netGraph.abcdq_allele(), )
                         # fq = self.netGraph.abcdq_allele()
@@ -989,28 +972,14 @@ class Imputation(object):
                                 gen=g.split('/')
                                 for option in gen:
                                     optionDict[option]=True"""
-                    for hap_k in hap_list:
-                        # listType = []
-                        for g in hap_k:
-                            gen = g.split("/")
-                            for option in gen:
-                                optionDict[option] = True
-                        # print(listType)
-                    ##all_haps = fq.values.tolist()
-                    all_haps = fq
-                    hap_list = []
-                    for i in range(len(all_haps)):
-                        count = 0
-                        for gen in all_haps[i].split("~"):
-                            if not gen in optionDict:
-                                break
-                            else:
-                                count = count + 1
-                        if count == N_Loc:
 
-                            # all_haps[i][0]=all_haps[i][0].split("~")
-                            # hap_list.append(all_haps[i][0])
-                            hap_list.append(all_haps[i].split("~"))
+                    for gen in hap_list_splits:
+                        for option in gen:
+                            optionDict[option] = True
+                            # optionDict.add(option)
+                    ##all_haps = fq.values.tolist()
+                    hap_list = create_hap_list(fq, optionDict, N_Loc)
+
                     if k == 0:
                         H1.append(hap_list)
                     else:
@@ -1147,7 +1116,7 @@ class Imputation(object):
 
     def comp_hap_prob_plan_b(self, Hap, division, missing):
         if division[0] == list(set(self.index_dict.values())):  # [1, 2, 3, 4, 5]:
-            return self.comp_hap_prob(Hap[0], 0, 0, 0)
+            return self.comp_hap_prob([Hap[0]], 0, 0, 0)
         haplo_probs = self.find_option_freq(division, Hap, missing)
 
         # Return {'Haps': haplos, 'Probs': probs} of the dict
@@ -1609,6 +1578,9 @@ class Imputation(object):
             type_list.append(self.index_dict[locus])
         return type_list
 
+    def open_ambiguities(self, hap, loc, split_loc):
+        return open_ambiguities(hap, loc, split_loc)
+
     def comp_cand(
         self, gl_string, binary, epsilon, n, MUUG_output, haps_output, planb, em
     ):
@@ -1656,7 +1628,9 @@ class Imputation(object):
 
         if phases:
             if MUUG_output:
-                prior_matrix_orig = copy.deepcopy(self.priorMatrix)
+                prior_matrix_orig = np.array(
+                    self.priorMatrix, order="K", copy=True
+                )  # copy.deepcopy(self.priorMatrix)
                 res_muugs = self.call_comp_phase_prob(
                     epsilon, n, phases, chr, True, planb
                 )
@@ -1721,13 +1695,9 @@ class Imputation(object):
         # no plan b
         for level in range(2):
             if level == 1:
-                if self.unk_priors == "MR":
-                    self.priorMatrix = np.ones(
-                        (len(self.populations), len(self.populations))
-                    )
-                else:
-                    self.priorMatrix = np.identity(len(self.populations))
-                # self.priorMatrix = np.ones((len(self.populations), len(self.populations)))  ####
+                self.priorMatrix = np.ones(
+                    (len(self.populations), len(self.populations))
+                )  ####
             if planb and len(res["Haps"]) == 0:
                 self.plan = "b"
                 epsilon = 1e-14
@@ -2048,129 +2018,130 @@ class Imputation(object):
 
         with f as lines:
             for (i, name_gl) in enumerate(lines):
-                # try:
-                name_gl = name_gl.rstrip()  # remove trailing whitespace
-                if "," in name_gl:
-                    list_gl = name_gl.split(",")
-                else:
-                    list_gl = name_gl.split("%")
-
-                subject_id = list_gl[0]
-                subject_gl = list_gl[1]
-                subject_bin = [1] * (len(self.full_loci) - 1)
-                if f_bin_exist:
-                    subject_bin = f_bin[subject_id]
-                race1 = race2 = None
-                if len(list_gl) > 2:
-                    race1 = list_gl[2]
-                    race2 = list_gl[3]
-
-                start = timeit.default_timer()
-
-                #
-                # Impute One
-                # This method will impute one subject given the parameters
-                self.plan = "a"
-                self.option_1 = 0
-                self.option_2 = 0
-                subject_id, res_muugs, res_haps = self.impute_one(
-                    subject_id,
-                    subject_gl,
-                    subject_bin,
-                    race1,
-                    race2,
-                    priority,
-                    epsilon,
-                    n,
-                    MUUG_output,
-                    haps_output,
-                    planb,
-                    em,
-                )  # em
-
-                if res_muugs is None:
-                    problem.write(str(i) + "," + str(subject_id) + "\n")
-                    continue
-
-                if (len(res_haps["Haps"]) == 0 or res_haps["Haps"] == "NaN") and len(
-                    res_muugs["Haps"]
-                ) == 0:
-                    miss.write(str(i) + "," + str(subject_id) + "\n")
-
-                if haps_output:
-                    haps = res_haps["Haps"]
-                    probs = res_haps["Probs"]
-                    pops = res_haps["Pops"]
-                    print(
-                        "{index} Subject: {id} {hap_length} haplotypes".format(
-                            index=i, id=subject_id, hap_length=len(haps)
-                        )
-                    )
-                    if em_mr:
-                        write_best_hap_race_pairs(
-                            subject_id,
-                            haps,
-                            pops,
-                            probs,
-                            number_of_results,
-                            fout_hap_haplo,
-                        )
-                        write_best_prob(subject_id, pops, probs, 1, fout_pop_haplo)
+                try:
+                    name_gl = name_gl.rstrip()  # remove trailing whitespace
+                    if "," in name_gl:
+                        list_gl = name_gl.split(",")
                     else:
-                        write_best_prob(
-                            subject_id,
-                            haps,
-                            probs,
-                            number_of_results,
-                            fout_hap_haplo,
-                            "+",
-                        )
-                        write_best_prob(
-                            subject_id,
-                            pops,
-                            probs,
-                            number_of_pop_results,
-                            fout_pop_haplo,
-                        )
-                if MUUG_output:
-                    haps = res_muugs["Haps"]
-                    pops = res_muugs["Pops"]
-                    print(
-                        "{index} Subject: {id} {hap_length} haplotypes".format(
-                            index=i, id=subject_id, hap_length=len(haps)
-                        )
-                    )
-                    write_best_prob_genotype(
-                        subject_id, haps, number_of_results, fout_hap_muug
-                    )
-                    write_best_prob_genotype(
-                        subject_id, pops, number_of_pop_results, fout_pop_muug
-                    )
+                        list_gl = name_gl.split("%")
 
-                if self.verbose:
-                    self.logger.info(
-                        "{index} Subject: {id} {hap_length} haplotypes".format(
-                            index=i, id=subject_id, hap_length=len(haps)
-                        )
-                    )
-                    self.logger.info(
-                        "{index} Subject: {id} plan: {plan} oppen_phases - count of open regular option: {option1}, count of alternative opening: {option2}".format(
-                            index=i,
-                            id=subject_id,
-                            plan=self.plan,
-                            option1=self.option_1,
-                            option2=self.option_2,
-                        )
-                    )
+                    subject_id = list_gl[0]
+                    subject_gl = list_gl[1]
+                    subject_bin = [1] * (len(self.full_loci) - 1)
+                    if f_bin_exist:
+                        subject_bin = f_bin[subject_id]
+                    race1 = race2 = None
+                    if len(list_gl) > 2:
+                        race1 = list_gl[2]
+                        race2 = list_gl[3]
 
-                stop = timeit.default_timer()
-                time_taken = stop - start
-                print(time_taken)
-                if self.verbose:
-                    self.logger.info("Time taken: " + str(time_taken))
-                """except:
-                        problem.write(str(name_gl) + "\n")
-                        continue"""
+                    start = timeit.default_timer()
+
+                    #
+                    # Impute One
+                    # This method will impute one subject given the parameters
+                    self.plan = "a"
+                    self.option_1 = 0
+                    self.option_2 = 0
+                    subject_id, res_muugs, res_haps = self.impute_one(
+                        subject_id,
+                        subject_gl,
+                        subject_bin,
+                        race1,
+                        race2,
+                        priority,
+                        epsilon,
+                        n,
+                        MUUG_output,
+                        haps_output,
+                        planb,
+                        em,
+                    )  # em
+
+                    if res_muugs is None:
+                        problem.write(str(i) + "," + str(subject_id) + "\n")
+                        continue
+
+                    if (
+                        len(res_haps["Haps"]) == 0 or res_haps["Haps"] == "NaN"
+                    ) and len(res_muugs["Haps"]) == 0:
+                        miss.write(str(i) + "," + str(subject_id) + "\n")
+
+                    if haps_output:
+                        haps = res_haps["Haps"]
+                        probs = res_haps["Probs"]
+                        pops = res_haps["Pops"]
+                        print(
+                            "{index} Subject: {id} {hap_length} haplotypes".format(
+                                index=i, id=subject_id, hap_length=len(haps)
+                            )
+                        )
+                        if em_mr:
+                            write_best_hap_race_pairs(
+                                subject_id,
+                                haps,
+                                pops,
+                                probs,
+                                number_of_results,
+                                fout_hap_haplo,
+                            )
+                            write_best_prob(subject_id, pops, probs, 1, fout_pop_haplo)
+                        else:
+                            write_best_prob(
+                                subject_id,
+                                haps,
+                                probs,
+                                number_of_results,
+                                fout_hap_haplo,
+                                "+",
+                            )
+                            write_best_prob(
+                                subject_id,
+                                pops,
+                                probs,
+                                number_of_pop_results,
+                                fout_pop_haplo,
+                            )
+                    if MUUG_output:
+                        haps = res_muugs["Haps"]
+                        pops = res_muugs["Pops"]
+                        print(
+                            "{index} Subject: {id} {hap_length} haplotypes".format(
+                                index=i, id=subject_id, hap_length=len(haps)
+                            )
+                        )
+                        write_best_prob_genotype(
+                            subject_id, haps, number_of_results, fout_hap_muug
+                        )
+                        write_best_prob_genotype(
+                            subject_id, pops, number_of_pop_results, fout_pop_muug
+                        )
+
+                    if self.verbose:
+                        self.logger.info(
+                            "{index} Subject: {id} {hap_length} haplotypes".format(
+                                index=i, id=subject_id, hap_length=len(haps)
+                            )
+                        )
+                        self.logger.info(
+                            "{index} Subject: {id} plan: {plan} oppen_phases - count of open regular option: {option1}, count of alternative opening: {option2}".format(
+                                index=i,
+                                id=subject_id,
+                                plan=self.plan,
+                                option1=self.option_1,
+                                option2=self.option_2,
+                            )
+                        )
+
+                    stop = timeit.default_timer()
+                    time_taken = stop - start
+                    print(time_taken)
+                    if self.verbose:
+                        self.logger.info("Time taken: " + str(time_taken))
+                except:
+                    print(f"{i} Subject: {subject_id} - Exception")
+                    problem.write(str(name_gl) + "\n")
+                    continue
 
             f.close()
             if MUUG_output:

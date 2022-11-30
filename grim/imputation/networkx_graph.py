@@ -25,7 +25,7 @@ class Graph(object):
         self.full_loci = config["full_loci"]
         self.nodes_plan_a, self.nodes_plan_b = [], []
         if config["nodes_for_plan_A"]:
-            path = ("/").join(config["node_file"].split("/")[:-1])
+            path = "/".join(config["node_file"].split("/")[:-1])
 
             # bug: dies if file doesn't exist
             # bug: list_f doesn't exist
@@ -45,7 +45,7 @@ class Graph(object):
         # add nodes from file
         with open(nodesFile) as nodesfile:
             readNodes = csv.reader(nodesfile, delimiter=",")
-            firstLine = next(readNodes)
+            next(readNodes)
             for row in readNodes:
                 if len(row) > 0:
                     if not self.nodes_plan_a or row[2] in self.nodes_plan_a:
@@ -67,7 +67,7 @@ class Graph(object):
         # add edges from file
         with open(edgesFile) as edgesfile:
             readEdges = csv.reader(edgesfile, delimiter=",")
-            firstLine = next(readEdges)
+            next(readEdges)
             for row in readEdges:
                 if len(row) > 0:
                     node1 = nodesDict[row[0]]
@@ -83,21 +83,21 @@ class Graph(object):
         # add edges from file
         with open(allEdgesFile) as allEdgesfile:
             readEdges = csv.reader(allEdgesfile, delimiter=",")
-            firstLine = next(readEdges)
+            next(readEdges)
             for row in readEdges:
                 if len(row) > 0:
                     node1 = nodesDict[row[0]]
                     node2 = nodesDict[row[1]]
-                    kind = "-".join(
-                        sorted(
-                            [
-                                self.whole_graph.nodes[node1]["label"],
-                                self.whole_graph.nodes[node2]["label"],
-                            ],
-                            key=len,
-                        )
-                    )
-                    self.whole_graph.add_edge(node1, node2, color=kind)
+                    if len(self.whole_graph.nodes[node1]["label"]) < len(
+                        self.whole_graph.nodes[node2]["label"]
+                    ):
+                        connector = self.whole_graph.nodes[node2]["label"] + node1
+                        self.whole_graph.add_edge(node1, connector)
+                        self.whole_graph.add_edge(connector, node2)
+                    else:
+                        connector = self.whole_graph.nodes[node1]["label"] + node2
+                        self.whole_graph.add_edge(node2, connector)
+                        self.whole_graph.add_edge(connector, node1)
 
         allEdgesfile.close()
         nodesDict.clear()
@@ -137,9 +137,10 @@ class Graph(object):
     def adjs_query(self, alleleList):
         adjDict = dict()
         for allele in alleleList:
-            if allele in self.graph.nodes():
-                if self.graph.nodes[allele]["label"] == self.full_loci:  # 'ABCQR':
-                    adjDict[allele] = self.graph.nodes[allele]["freq"]
+            if allele in self.graph:
+                allele_node = self.graph.nodes[allele]
+                if allele_node["label"] == self.full_loci:  # 'ABCQR':
+                    adjDict[allele] = allele_node["freq"]
                 else:
                     adjs = self.graph.adj[allele]
                     for adj in adjs:
@@ -154,27 +155,8 @@ class Graph(object):
             return self.node_probs(alleleList, labelA)
 
         for allele in alleleList:
-            if allele in self.whole_graph.nodes():
-                copyLabelA = labelA
-                newLabelA = labelA
-                miss = missing(labelA, labelB)
-                alleles = [allele]
-
-                while len(miss) > 0:
-                    tmpAllels = list()
-                    newLabelA = copyLabelA + miss[0]
-                    newLabelA = "".join(sorted(newLabelA))
-                    del miss[0]
-                    for oneAllel in alleles:
-                        #    alleles.remove(oneAllel)
-                        adjs = self.whole_graph.adj[oneAllel]
-                        label = copyLabelA + "-" + newLabelA
-                        for adj in adjs:
-                            if adjs[adj]["color"] == label:
-                                tmpAllels.append(adj)
-                    alleles = tmpAllels
-                    copyLabelA = newLabelA
-
+            if allele in self.whole_graph:
+                alleles = self.whole_graph.adj.get(labelB + allele, [])
                 for adj in alleles:
                     adjDict[adj] = self.whole_graph.nodes[adj]["freq"]
         return adjDict
@@ -184,10 +166,10 @@ class Graph(object):
         nodesDict = dict()
         if not self.nodes_plan_b or label in self.nodes_plan_b:
             for node in nodes:
-                if node in self.whole_graph.nodes():
+                if node in self.whole_graph:
                     nodesDict[node] = self.whole_graph.nodes[node]["freq"]
         elif label in self.nodes_plan_a:
             for node in nodes:
-                if node in self.whole_graph.nodes():
+                if node in self.whole_graph:
                     nodesDict[node] = self.graph.nodes[node]["freq"]
         return nodesDict
