@@ -38,7 +38,7 @@
   "output_haplotypes": true,
   "freq_data_dir": "data/freqs" ,
   "freq_file": "output/hpf.csv" ,
-  "graph_files_path": "output/csv/" ,
+  "graph_files_path": "graph_generation/output/csv/" ,
   "node_csv_file": "nodes.csv",
   "edges_csv_file": "edges.csv",
   "info_node_csv_file": "info_node.csv",
