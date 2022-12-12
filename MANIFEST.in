@@ -8,3 +8,7 @@ recursive-include grim *.txt
 recursive-include grim *.json
 recursive-include grim *.pyx
 recursive-include grim *.pyd
+recursive-include conf *.json
+recursive-include data *.csv
+recursive-include graph_generation *.csv
+recursive-include graph_generation *.py

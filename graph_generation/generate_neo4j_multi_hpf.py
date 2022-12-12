@@ -205,7 +205,7 @@ def loci_order(loc_values):
 
 
 def generate_graph(
-    config_file="../../conf/minimal-configuration.json", em_pop=None, em=False
+    config_file="../conf/minimal-configuration-script.json", em_pop=None, em=False, use_default_path = False
 ):
     ##############################################################################
     # Configure
@@ -215,7 +215,9 @@ def generate_graph(
 
     # Input file
     # freq_file = path  + freq_file
-
+    path = ""
+    if use_default_path:
+         path =  os.path.dirname(os.path.realpath(__file__)) + "/"
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",
@@ -243,10 +245,10 @@ def generate_graph(
         pops = em_pop
     freq_trim = conf.get("freq_trim_threshold")
 
-    freq_file = conf.get("freq_file")
+    freq_file = path + conf.get("freq_file")
     dict_count_of_pop = {}
 
-    pop_ratio_dir = conf.get("pops_count_file")
+    pop_ratio_dir = path + conf.get("pops_count_file", "")
     path = pathlib.Path(pop_ratio_dir)
 
     if em or not path.is_file():

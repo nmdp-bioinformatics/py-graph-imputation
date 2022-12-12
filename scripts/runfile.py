@@ -6,6 +6,8 @@ import pathlib
 import sys
 import os
 
+sys.path.insert(0, os.path.join(".."))
+
 from grim.imputation.impute import Imputation
 from grim.imputation.networkx_graph import Graph
 
@@ -18,7 +20,7 @@ parser.add_argument(
     "-c",
     "--config",
     required=False,
-    default="../conf/minimal-configuration.json",
+    default="../conf/minimal-configuration-script.json",
     help="Configuration JSON file",
     type=str,
 )
@@ -28,6 +30,7 @@ configuration_file = args.config
 
 # read the config file
 output_dir = "output/"
+project_dir = "../"
 
 # Read configuration file and load properties
 with open(configuration_file) as f:
@@ -42,11 +45,10 @@ config = {
     "number_of_pop_results": json_conf.get("number_of_pop_results", 100),
     "output_MUUG": json_conf.get("output_MUUG", True),
     "output_haplotypes": json_conf.get("output_haplotypes", False),
-    "node_file": json_conf.get("graph_files_path") + json_conf.get("node_csv_file"),
-    "top_links_file": json_conf.get("graph_files_path")
-    + json_conf.get("top_links_csv_file"),
-    "edges_file": json_conf.get("graph_files_path") + json_conf.get("edges_csv_file"),
-    "imputation_input_file": json_conf.get("imputation_in_file"),
+    "node_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("node_csv_file"),
+    "top_links_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("top_links_csv_file"),
+    "edges_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("edges_csv_file"),
+    "imputation_input_file": project_dir + json_conf.get("imputation_in_file"),
     "imputation_out_umug_freq_file": output_dir
     + json_conf.get("imputation_out_umug_freq_filename"),
     "imputation_out_umug_pops_file": output_dir

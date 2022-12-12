@@ -77,10 +77,11 @@ setup(
         include=[
             "grim",
             "grim.imputation",
-            "grim.imputation.imputegl",
-            "grim.imputation.graph_generation",
-            "grim.validation",
-            "grim.conf",
+            "graph_generation",
+            "graph_generation.output",
+            "data",
+            "data.subjects",
+            "conf"
         ]
     ),
     test_suite="tests",
