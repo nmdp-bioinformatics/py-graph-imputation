@@ -195,10 +195,11 @@ class Imputation(object):
 
             self.factor = 0.0001
             self._factor_missing_data = config["factor_missing_data"]
-            self.cypher = CypherQuery(config["loci_map"])
-            self.cypher_plan_b = CypherQueryPlanB(
-                config["loci_map"]
-            )  # , indxes_loc_dict_planb)
+            loci_map = {}
+            for locus, val in config["loci_map"].items():
+                loci_map[locus] = str(val)
+            self.cypher = CypherQuery(loci_map)
+            self.cypher_plan_b = CypherQueryPlanB(loci_map)  # , indxes_loc_dict_planb)
 
             self.matrix_planb = config["matrix_planb"]
 
