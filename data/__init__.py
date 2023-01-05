@@ -18,3 +18,5 @@
 #    > http://www.fsf.org/licensing/licenses/lgpl.html
 #    > http://www.opensource.org/licenses/lgpl-license.php
 #
+__organization__ = "NMDP/CIBMTR Bioinformatics"
+__version__ = "0.0.7"
