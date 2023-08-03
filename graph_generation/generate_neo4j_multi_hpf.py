@@ -62,6 +62,7 @@ def make_allele_list(haplotype, full_name_index_dict, num_of_alleles):
     sorted_h1 = ["0"] * num_of_alleles
     for allele in hl:
         locus = allele.split("*")[0]
+        # print(allele, hl)
         sorted_h1[full_name_index_dict[locus] - 1] = allele
     return sorted_h1
 
