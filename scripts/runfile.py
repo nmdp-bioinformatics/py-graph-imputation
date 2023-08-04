@@ -36,6 +36,7 @@ project_dir = "../"
 with open(configuration_file) as f:
     json_conf = json.load(f)
 
+output_dir = json_conf.get("imputation_out_path")
 config = {
     "planb": json_conf.get("planb", True),
     "pops": json_conf.get("populations"),

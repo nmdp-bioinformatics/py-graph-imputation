@@ -4,7 +4,7 @@ import json
 import pathlib
 import argparse
 
-project_dir = "./"
+project_dir = ""
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -32,7 +32,7 @@ freq_file = project_dir + conf.get("freq_file")
 
 
 # Create output directory if it doesn't exist
-pathlib.Path(output_dir).mkdir(parents=False, exist_ok=True)
+pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
 
 # Display the configurations we are using
 print(
