@@ -36,6 +36,7 @@ project_dir = "../"
 with open(configuration_file) as f:
     json_conf = json.load(f)
 
+output_dir = json_conf.get("imputation_out_path")
 config = {
     "planb": json_conf.get("planb", True),
     "pops": json_conf.get("populations"),
@@ -45,9 +46,15 @@ config = {
     "number_of_pop_results": json_conf.get("number_of_pop_results", 100),
     "output_MUUG": json_conf.get("output_MUUG", True),
     "output_haplotypes": json_conf.get("output_haplotypes", False),
-    "node_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("node_csv_file"),
-    "top_links_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("top_links_csv_file"),
-    "edges_file": project_dir + json_conf.get("graph_files_path") + json_conf.get("edges_csv_file"),
+    "node_file": project_dir
+    + json_conf.get("graph_files_path")
+    + json_conf.get("node_csv_file"),
+    "top_links_file": project_dir
+    + json_conf.get("graph_files_path")
+    + json_conf.get("top_links_csv_file"),
+    "edges_file": project_dir
+    + json_conf.get("graph_files_path")
+    + json_conf.get("edges_csv_file"),
     "imputation_input_file": project_dir + json_conf.get("imputation_in_file"),
     "imputation_out_umug_freq_file": output_dir
     + json_conf.get("imputation_out_umug_freq_filename"),

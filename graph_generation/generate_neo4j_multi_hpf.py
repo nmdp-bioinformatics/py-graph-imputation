@@ -62,6 +62,7 @@ def make_allele_list(haplotype, full_name_index_dict, num_of_alleles):
     sorted_h1 = ["0"] * num_of_alleles
     for allele in hl:
         locus = allele.split("*")[0]
+        # print(allele, hl)
         sorted_h1[full_name_index_dict[locus] - 1] = allele
     return sorted_h1
 
@@ -205,7 +206,10 @@ def loci_order(loc_values):
 
 
 def generate_graph(
-    config_file="../conf/minimal-configuration-script.json", em_pop=None, em=False, use_default_path = False
+    config_file="../conf/minimal-configuration-script.json",
+    em_pop=None,
+    em=False,
+    use_default_path=False,
 ):
     ##############################################################################
     # Configure
@@ -217,7 +221,7 @@ def generate_graph(
     # freq_file = path  + freq_file
     path = ""
     if use_default_path:
-         path =  os.path.dirname(os.path.realpath(__file__)) + "/"
+        path = os.path.dirname(os.path.realpath(__file__)) + "/"
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-c",

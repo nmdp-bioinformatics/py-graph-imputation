@@ -139,4 +139,5 @@ allure_report/
 # cython temp files
 grim/**/*.c
 
+.DS_Store
 output/

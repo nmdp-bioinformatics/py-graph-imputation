@@ -3,6 +3,6 @@ Description of Pull Request..
 ## Checklist
 
 - [ ] Unit tests
-- [ ] Documentation 
+- [ ] Documentation
 
 Fixes #

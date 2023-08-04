@@ -81,7 +81,7 @@ setup(
             "graph_generation.output",
             "data",
             "data.subjects",
-            "conf"
+            "conf",
         ]
     ),
     test_suite="tests",
