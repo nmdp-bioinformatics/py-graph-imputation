@@ -7,7 +7,7 @@ import argparse
 
 def produce_hpf(conf_file):
     # Read configuration file and load properties
-    with open(configuration_file) as f:
+    with open(conf_file) as f:
         conf = json.load(f)
 
     pops = conf.get("populations")
