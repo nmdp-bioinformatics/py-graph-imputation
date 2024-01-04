@@ -53,5 +53,4 @@
   "max_haplotypes_number_in_phase": 100,
   "imputation_out_path": "output",
   "pops_count_file": "output/pop_counts_file.txt"
-  "imputation_out_path": "output"
 }
