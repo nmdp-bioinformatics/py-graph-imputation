@@ -93,7 +93,7 @@ This will produce the following files:
 #### Produce Imputation Results for Subjects
 
 ```
->>> from grim.grim import graph_freqs, impute
+>>> from grim.grim import impute
 >>> impute(conf_file='conf/minimal-configuration.json')
 ****************************************************************************************************
 Performing imputation based on:

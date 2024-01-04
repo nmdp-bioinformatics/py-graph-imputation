@@ -318,6 +318,8 @@ def generate_graph(
     num_of_alleles = len(FULL_LOCI)
     with open(freq_file) as f:
         for hap_line in f:
+            if not hap_line:
+                continue
             haplotype, pop, freq = hap_line.split(",")
             if haplotype == "hap":
                 continue
