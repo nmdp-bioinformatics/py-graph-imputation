@@ -35,7 +35,10 @@ How to develop on the project locally.
    ```shell
    source venv/bin/activate
    ```
-5. Development workflow is driven through `Makefile`. Use `make` to list show all targets.
+5. Run the following commands:
+    cd grim/imputation
+    python setup.py build_ext --inplace
+6. Development workflow is driven through `Makefile`. Use `make` to list show all targets.
    ```
     > make
     clean                remove all build, test, coverage and Python artifacts
@@ -54,11 +57,11 @@ How to develop on the project locally.
     venv                 creates a Python3 virtualenv environment in venv
     activate             activate a virtual environment. Run `make venv` before activating.
    ```
-6. Install all the development dependencies. Will install packages from all `requirements-*.txt` files.
+7. Install all the development dependencies. Will install packages from all `requirements-*.txt` files.
    ```shell
     make install
    ```
-7. Package Module files go in the `grim` directory.
+8. Package Module files go in the `grim` directory.
     ```
     grim
     |-- __init__.py
@@ -71,11 +74,11 @@ How to develop on the project locally.
         |-- impute.py
         `-- networkx_graph.py
     ```
-8. Run all tests with `make test` or different tests with `make behave` or `make pytest`.
-9. Run `make lint` to run the linter and black formatter.
-10. Use `python app.py` to run the Flask service app in debug mode. Service will be available at http://localhost:8080/
-11. Use `make docker-build` to build a docker image using the current `Dockerfile`.
-12. `make docker` will build and run the docker image with the service.  Service will be available at http://localhost:8080/
+9. Run all tests with `make test` or different tests with `make behave` or `make pytest`.
+10. Run `make lint` to run the linter and black formatter.
+11. Use `python app.py` to run the Flask service app in debug mode. Service will be available at http://localhost:8080/
+12. Use `make docker-build` to build a docker image using the current `Dockerfile`.
+13. `make docker` will build and run the docker image with the service.  Service will be available at http://localhost:8080/
 
 
 ### Running a minimal configuration example
