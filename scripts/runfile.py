@@ -30,7 +30,7 @@ configuration_file = args.config
 
 # read the config file
 output_dir = "output/"
-project_dir = "../"
+project_dir = "./"
 
 # Read configuration file and load properties
 with open(configuration_file) as f:

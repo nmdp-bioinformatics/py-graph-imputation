@@ -33,7 +33,7 @@ def run_impute(
     graph_files_path = json_conf.get("graph_files_path")
     if graph_files_path[-1] != "/":
         graph_files_path += "/"
-    output_dir = json_conf.get("imuptation_out_path", "output")
+    output_dir = json_conf.get("imputation_out_path", "output")
     if output_dir[-1] != "/":
         output_dir += "/"
     config = {
