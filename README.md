@@ -36,7 +36,9 @@ How to develop on the project locally.
    source venv/bin/activate
    ```
 5. Run the following commands:
+
     cd grim/imputation
+
     python setup.py build_ext --inplace
 6. Development workflow is driven through `Makefile`. Use `make` to list show all targets.
    ```
