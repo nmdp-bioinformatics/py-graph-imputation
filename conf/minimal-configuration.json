@@ -51,5 +51,6 @@
   "imputation_out_miss_filename": "don.miss",
   "imputation_out_problem_filename": "don.problem",
   "max_haplotypes_number_in_phase": 100,
-  "imuptation_out_path": "output"
+  "imputation_out_path": "output",
+  "pops_count_file": "output/pop_counts_file.txt"
 }
