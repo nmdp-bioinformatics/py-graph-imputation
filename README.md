@@ -38,7 +38,7 @@ so it appears as:
 │       └── donor.csv
 ```
 
-### Modify the configuration.json to suit your need
+#### Modify the configuration.json to suit your need
 
 
 #### Produce HPF csv file from Frequency Data
@@ -64,7 +64,7 @@ This will produce the files which will be used for graph generation:
 │   └── pop_counts_file.txt     # Size of each population
 ```
 
-### Generate the Graph (nodes and edges) file
+#### Generate the Graph (nodes and edges) files
 
 ```
 >>> from grim.grim import graph_freqs
@@ -90,7 +90,7 @@ This will produce the following files:
 
 ```
 
-### Produce Imputation Results for Subjects
+#### Produce Imputation Results for Subjects
 
 ```
 >>> from grim.grim import graph_freqs, impute
