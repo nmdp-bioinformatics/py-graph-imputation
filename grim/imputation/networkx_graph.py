@@ -96,11 +96,12 @@ class Graph(object):
                             self.Whole_Vertices.append(connector)
                             connector_id = len(self.Whole_Vertices) - 1
                             self.Whole_Vertices_attributes[connector] = connector_id
+
+                            self.Whole_Edges.append([node1_id, connector_id])
                         else:
                             connector_id = self.Whole_Vertices_attributes[connector]
 
                         # Append the connector to the whole edges array
-                        self.Whole_Edges.append([node1_id, connector_id])
                         self.Whole_Edges.append([connector_id, node2_id])
 
                     else:
