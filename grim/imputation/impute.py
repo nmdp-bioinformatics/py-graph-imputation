@@ -949,7 +949,7 @@ class Imputation(object):
                     optionDict = {}  # set()
                     if len(fq) == 0:
                         _list = []
-                        for (gen, name) in self.cypher.loc_map.items():
+                        for gen, name in self.cypher.loc_map.items():
                             count = 0
                             for i in range(len(hap_list[0])):
                                 if hap_list[0][i].split("*", 1)[0] == gen:
@@ -2017,7 +2017,7 @@ class Imputation(object):
         problem = open(config["imputation_out_problem_file"], "w")
 
         with f as lines:
-            for (i, name_gl) in enumerate(lines):
+            for i, name_gl in enumerate(lines):
                 try:
                     name_gl = name_gl.rstrip()  # remove trailing whitespace
                     if "," in name_gl:
