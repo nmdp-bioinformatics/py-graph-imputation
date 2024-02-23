@@ -50,13 +50,20 @@ class Graph(object):
                     if not self.nodes_plan_a or row[2] in self.nodes_plan_a:
                         self.Vertices.append(row[1])
                         vertex_id = len(self.Vertices) - 1
-                        self.Vertices_attributes[row[1]] = (row[2], list(map(float, row[3].split(";"))), vertex_id)
+                        self.Vertices_attributes[row[1]] = (
+                            row[2],
+                            list(map(float, row[3].split(";"))),
+                            vertex_id,
+                        )
 
                     if not self.nodes_plan_b or row[2] in self.nodes_plan_b:
                         self.Whole_Vertices.append(row[1])
                         vertex_id = len(self.Whole_Vertices) - 1
                         self.Whole_Vertices_attributes[row[1]] = (
-                            row[2], list(map(float, row[3].split(";"))), vertex_id)
+                            row[2],
+                            list(map(float, row[3].split(";"))),
+                            vertex_id,
+                        )
 
                     nodesDict[row[0]] = row[1]
 
@@ -70,7 +77,10 @@ class Graph(object):
                     node2_id = row[1]
                     node1 = nodesDict[node1_id]
                     node2 = nodesDict[node2_id]
-                    if node1 in self.Vertices_attributes and node2 in self.Vertices_attributes:
+                    if (
+                        node1 in self.Vertices_attributes
+                        and node2 in self.Vertices_attributes
+                    ):
                         node1_label = self.Vertices_attributes[node1][0]
                         if node1_label == self.full_loci:
                             self.Edges.append([node2_id, node1_id])
@@ -145,7 +155,9 @@ class Graph(object):
         del sorted_indices
 
         # Create a list of the first appearance of a number in the 0 column in the matrix
-        unique_values, first_occurrences_indices = np.unique(self.Edges[:, 0], return_index=True)
+        unique_values, first_occurrences_indices = np.unique(
+            self.Edges[:, 0], return_index=True
+        )
 
         j = 0
         for i in range(0, self.Vertices.shape[0]):
@@ -162,7 +174,9 @@ class Graph(object):
         del unique_values, first_occurrences_indices
 
         # Create a list of the first appearance of a number in the 0 column in the matrix
-        unique_values, first_occurrences_indices = np.unique(self.Whole_Edges[:, 0], return_index=True)
+        unique_values, first_occurrences_indices = np.unique(
+            self.Whole_Edges[:, 0], return_index=True
+        )
 
         j = 0
         for i in range(0, self.Whole_Vertices.shape[0]):
@@ -182,7 +196,9 @@ class Graph(object):
         self.Whole_Neighbors_start.append(int(len(self.Whole_Vertices)))
 
         self.Neighbors_start = np.array(self.Neighbors_start, dtype=np.uint32)
-        self.Whole_Neighbors_start = np.array(self.Whole_Neighbors_start, dtype=np.uint32)
+        self.Whole_Neighbors_start = np.array(
+            self.Whole_Neighbors_start, dtype=np.uint32
+        )
 
         # Take the first column out of the Edges arrays
         ### Do the following to massive save of memory
@@ -249,7 +265,13 @@ class Graph(object):
                     allele_id = self.Vertices_attributes[allele][2]
                     # Find the neighbors of the allele
                     allele_neighbors = self.Vertices[
-                        self.Edges[range(self.Neighbors_start[allele_id], self.Neighbors_start[allele_id + 1])]]
+                        self.Edges[
+                            range(
+                                self.Neighbors_start[allele_id],
+                                self.Neighbors_start[allele_id + 1],
+                            )
+                        ]
+                    ]
                     # The frequencies of the neighbors to the dictionary
                     for adj in allele_neighbors:
                         adjDict[adj] = self.Vertices_attributes[adj][1]
@@ -271,9 +293,14 @@ class Graph(object):
 
                 if connector in self.Whole_Vertices_attributes:
                     connector_id = self.Whole_Vertices_attributes[connector]
-                    alleles = self.Whole_Vertices[self.Whole_Edges[range(self.Whole_Neighbors_start[connector_id],
-                                                                         self.Whole_Neighbors_start[
-                                                                             connector_id + 1])]]
+                    alleles = self.Whole_Vertices[
+                        self.Whole_Edges[
+                            range(
+                                self.Whole_Neighbors_start[connector_id],
+                                self.Whole_Neighbors_start[connector_id + 1],
+                            )
+                        ]
+                    ]
 
                 for adj in alleles:
                     adjDict[adj] = self.Whole_Vertices_attributes[adj][1]

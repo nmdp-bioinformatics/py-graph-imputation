@@ -20,22 +20,19 @@ pip install py-graph-imputation
 
 #### Get Frequency Data and Subject Data and Configuration File
 
-For an example, copy the folders to your working directory:
- -  https://github.com/nmdp-bioinformatics/py-graph-imputation/tree/master/data
- -  https://github.com/nmdp-bioinformatics/py-graph-imputation/tree/master/conf
+For an example, get [example-conf-data.zip](https://github.com/nmdp-bioinformatics/py-graph-imputation/tree/master/example-conf-data.zip)
 
-so it appears as:
+Unzip the folder so it appears as:
 
 ```
-.
-├── conf
-│   ├── README.md
-│   └── minimal-configuration.json
-├── data
-│   ├── freqs
-│   │   └── CAU.freqs.gz
-│   └── subjects
-│       └── donor.csv
+conf
+|-- README.md
+`-- minimal-configuration.json
+data
+|-- freqs
+|   `-- CAU.freqs.gz
+`-- subjects
+    `-- donor.csv
 ```
 
 #### Modify the configuration.json to suit your need
@@ -59,9 +56,9 @@ Writing hpf File:	 output/hpf.csv
 This will produce the files which will be used for graph generation:
 
 ```
-├── output
-│   ├── hpf.csv                 # CSV file of Haplotype, Populatio, Freq
-│   └── pop_counts_file.txt     # Size of each population
+output
+|-- hpf.csv                         # CSV file of Haplotype, Populatio, Freq
+`-- pop_counts_file.txt             # Size of each population
 ```
 
 #### Generate the Graph (nodes and edges) files
@@ -81,13 +78,12 @@ Performing graph generation based on following configuration:
 This will produce the following files:
 
 ```
-├── output
-│   ├── csv
-│   │   ├── edges.csv
-│   │   ├── info_node.csv
-│   │   ├── nodes.csv
-│   │   └── top_links.csv
-
+output
+`-- csv
+    |-- edges.csv
+    |-- info_node.csv
+    |-- nodes.csv
+    `-- top_links.csv
 ```
 
 #### Produce Imputation Results for Subjects
@@ -133,12 +129,12 @@ This will produce files in `output` directory as:
 
 ```
 ├── output
-│   ├── don.miss                # Cases that failed imputation (e.g. incorrect typing etc.)
-│   ├── don.pmug                # Phased imputation as PMUG GL String
-│   ├── don.pmug.pops           # Population for Phased Imputation
-│   ├── don.problem             # List of errors
-│   ├── don.umug                # Unphased imputation as UMUG GL String
-│   ├── don.umug.pops           # Population for Phased Imputation
+│ ├── don.miss                # Cases that failed imputation (e.g. incorrect typing etc.)
+│ ├── don.pmug                # Phased imputation as PMUG GL String
+│ ├── don.pmug.pops           # Population for Phased Imputation
+│ ├── don.problem             # List of errors
+│ ├── don.umug                # Unphased imputation as UMUG GL String
+│ ├── don.umug.pops           # Population for Phased Imputation
 ```
 
 
