@@ -16,7 +16,7 @@ from .imputation.networkx_graph import Graph
 # pr.enable()
 
 
-def full_path(original_path, output):
+def full_path(output, original_path):
     """
     Modifies the given path by replacing the last segment with the output directory
     and appending the original last segment to the new path.
