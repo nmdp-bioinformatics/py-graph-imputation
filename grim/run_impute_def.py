@@ -4,6 +4,7 @@ import json
 import pathlib
 import sys
 import os
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
@@ -15,10 +16,34 @@ from .imputation.networkx_graph import Graph
 # pr.enable()
 
 
+def full_path(output, original_path):
+    """
+    Modifies the given path by replacing the last segment with the output directory
+    and appending the original last segment to the new path.
+
+    Parameters:
+        original_path (str): The original file path.
+        output (str): The new directory name to replace the last segment.
+
+    Returns:
+        str: The modified file path.
+    """
+    # Convert to Path object
+    path = Path(original_path)
+
+    # Construct the new path
+    new_path = path.parent / output / path.name
+
+    # Return the new path as a string
+    return str(new_path)
+
+
 def run_impute(
     conf_file="../conf/minimal-configuration.json",
     project_dir_graph="",
     project_dir_in_file="",
+    hap_pop_pair = False,
+    graph = None
 ):
 
     configuration_file = conf_file
@@ -56,18 +81,12 @@ def run_impute(
         + json_conf.get("edges_csv_file"),
         "imputation_input_file": project_dir_in_file
         + json_conf.get("imputation_in_file"),
-        "imputation_out_umug_freq_file": output_dir
-        + json_conf.get("imputation_out_umug_freq_filename"),
-        "imputation_out_umug_pops_file": output_dir
-        + json_conf.get("imputation_out_umug_pops_filename"),
-        "imputation_out_hap_freq_file": output_dir
-        + json_conf.get("imputation_out_hap_freq_filename"),
-        "imputation_out_hap_pops_file": output_dir
-        + json_conf.get("imputation_out_hap_pops_filename"),
-        "imputation_out_miss_file": output_dir
-        + json_conf.get("imputation_out_miss_filename"),
-        "imputation_out_problem_file": output_dir
-        + json_conf.get("imputation_out_problem_filename"),
+        "imputation_out_umug_freq_file": full_path(output_dir, json_conf.get("imputation_out_umug_freq_filename")),
+        "imputation_out_umug_pops_file": full_path(output_dir, json_conf.get("imputation_out_umug_pops_filename")),
+        "imputation_out_hap_freq_file": full_path(output_dir, json_conf.get("imputation_out_hap_freq_filename")),
+        "imputation_out_hap_pops_file": full_path(output_dir, json_conf.get("imputation_out_hap_pops_filename")),
+        "imputation_out_miss_file": full_path(output_dir, json_conf.get("imputation_out_miss_filename")),
+        "imputation_out_problem_file": full_path(output_dir, json_conf.get("imputation_out_problem_filename")),
         "factor_missing_data": json_conf.get("factor_missing_data", 0.01),
         "loci_map": json_conf.get(
             "loci_map", {"A": 1, "B": 3, "C": 2, "DQB1": 4, "DRB1": 5}
@@ -161,18 +180,21 @@ def run_impute(
 
     config["full_loci"] = "".join(sorted(all_loci_set))
     # Perform imputation
-    graph = Graph(config)
-    graph.build_graph(
-        config["node_file"], config["top_links_file"], config["edges_file"]
-    )
+    if graph==None:
+        graph = Graph(config)
+        graph.build_graph(
+            config["node_file"], config["top_links_file"], config["edges_file"]
+        )
     imputation = Imputation(graph, config)
 
     # Create output directory if it doesn't exist
     pathlib.Path(output_dir).mkdir(parents=False, exist_ok=True)
 
     # Write out the results from imputation
-    imputation.impute_file(config)
+    imputation.impute_file(config, em_mr=hap_pop_pair)
 
     # Profiler end
     # pr.disable()
     # pr.print_stats(sort="time")
+
+    return graph
