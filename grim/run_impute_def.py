@@ -42,10 +42,9 @@ def run_impute(
     conf_file="../conf/minimal-configuration.json",
     project_dir_graph="",
     project_dir_in_file="",
-    hap_pop_pair = False,
-    graph = None
+    hap_pop_pair=False,
+    graph=None,
 ):
-
     configuration_file = conf_file
 
     # project_dir = ""# "../"
@@ -81,12 +80,24 @@ def run_impute(
         + json_conf.get("edges_csv_file"),
         "imputation_input_file": project_dir_in_file
         + json_conf.get("imputation_in_file"),
-        "imputation_out_umug_freq_file": full_path(output_dir, json_conf.get("imputation_out_umug_freq_filename")),
-        "imputation_out_umug_pops_file": full_path(output_dir, json_conf.get("imputation_out_umug_pops_filename")),
-        "imputation_out_hap_freq_file": full_path(output_dir, json_conf.get("imputation_out_hap_freq_filename")),
-        "imputation_out_hap_pops_file": full_path(output_dir, json_conf.get("imputation_out_hap_pops_filename")),
-        "imputation_out_miss_file": full_path(output_dir, json_conf.get("imputation_out_miss_filename")),
-        "imputation_out_problem_file": full_path(output_dir, json_conf.get("imputation_out_problem_filename")),
+        "imputation_out_umug_freq_file": full_path(
+            output_dir, json_conf.get("imputation_out_umug_freq_filename")
+        ),
+        "imputation_out_umug_pops_file": full_path(
+            output_dir, json_conf.get("imputation_out_umug_pops_filename")
+        ),
+        "imputation_out_hap_freq_file": full_path(
+            output_dir, json_conf.get("imputation_out_hap_freq_filename")
+        ),
+        "imputation_out_hap_pops_file": full_path(
+            output_dir, json_conf.get("imputation_out_hap_pops_filename")
+        ),
+        "imputation_out_miss_file": full_path(
+            output_dir, json_conf.get("imputation_out_miss_filename")
+        ),
+        "imputation_out_problem_file": full_path(
+            output_dir, json_conf.get("imputation_out_problem_filename")
+        ),
         "factor_missing_data": json_conf.get("factor_missing_data", 0.01),
         "loci_map": json_conf.get(
             "loci_map", {"A": 1, "B": 3, "C": 2, "DQB1": 4, "DRB1": 5}
@@ -180,7 +191,7 @@ def run_impute(
 
     config["full_loci"] = "".join(sorted(all_loci_set))
     # Perform imputation
-    if graph==None:
+    if graph == None:
         graph = Graph(config)
         graph.build_graph(
             config["node_file"], config["top_links_file"], config["edges_file"]
