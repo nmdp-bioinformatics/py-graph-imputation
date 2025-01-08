@@ -54,11 +54,9 @@ def graph_freqs(conf_file="", for_em=False, em_pop=None):
     )
 
 
-def impute(conf_file="", hap_pop_pair = False, graph = None):
-
+def impute(conf_file="", hap_pop_pair=False, graph=None):
     project_dir_in_file, project_dir_graph = "", ""
     if conf_file == "":
-
         conf_file = (
             os.path.dirname(os.path.realpath(__file__)).replace("/grim", "")
             + "/conf/minimal-configuration.json"
@@ -70,7 +68,9 @@ def impute(conf_file="", hap_pop_pair = False, graph = None):
         project_dir_in_file = (
             os.path.dirname(os.path.realpath(__file__)).replace("/grim", "") + "/"
         )
-    graph = run_impute(conf_file, project_dir_graph, project_dir_in_file, hap_pop_pair, graph)
+    graph = run_impute(
+        conf_file, project_dir_graph, project_dir_in_file, hap_pop_pair, graph
+    )
     return graph
 
 
