@@ -45,7 +45,6 @@ def run_impute(
     hap_pop_pair=False,
     graph=None,
 ):
-
     configuration_file = conf_file
 
     # project_dir = ""# "../"
