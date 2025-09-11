@@ -2,7 +2,7 @@
   "populations": [
     "CAU"
   ],
-  "freq_trim_threshold": 1e-5,
+  "freq_trim_threshold": 0.1,
  "priority": {
    "alpha": 0.4999999,
     "eta": 0,
@@ -29,10 +29,10 @@
                 [[1], [2, 3], [4], [5]],
                 [[1], [2], [3], [4], [5]]
             ],
-  "planb": true,
+  "planb": false,
   "number_of_options_threshold": 100000,
   "epsilon": 1e-3,
-  "number_of_results": 10,
+  "number_of_results": 1000,
   "number_of_pop_results": 100,
   "output_MUUG": true,
   "output_haplotypes": true,
