@@ -26,8 +26,13 @@ def filter_results(res_haps, extra_gl):
 
     split_extra_gl_into_locus = extra_gl.split("^")
 
-    dct = {locus.split("*")[0]: [set(locus.split("+")[0].split("/")), set(locus.split("+")[1].split("/"))]
-           for locus in split_extra_gl_into_locus}
+    dct = {
+        locus.split("*")[0]: [
+            set(locus.split("+")[0].split("/")),
+            set(locus.split("+")[1].split("/")),
+        ]
+        for locus in split_extra_gl_into_locus
+    }
 
     haps = res_haps["Haps"]
     filter_idx = []
@@ -37,8 +42,10 @@ def filter_results(res_haps, extra_gl):
         for allele1, allele2 in zip(hap1.split("~"), hap2.split("~")):
             loc = allele1.split("*")[0]
             if loc in dct:
-                if not ((allele1 in dct[loc][0] and allele2 in dct[loc][1]) or (
-                        allele1 in dct[loc][1] and allele2 in dct[loc][0])):
+                if not (
+                    (allele1 in dct[loc][0] and allele2 in dct[loc][1])
+                    or (allele1 in dct[loc][1] and allele2 in dct[loc][0])
+                ):
                     check = False
                     break
         if check:
@@ -56,13 +63,13 @@ def create_subject_dict(file_path):
     subject_dict = {}
 
     # Open and read the file
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
             line = line.strip()
             if not line:
                 continue
 
-            subject_id = line.split(',', 1)[0]
+            subject_id = line.split(",", 1)[0]
 
             if subject_id not in subject_dict:
                 subject_dict[subject_id] = []
@@ -70,6 +77,7 @@ def create_subject_dict(file_path):
             subject_dict[subject_id].append(line)
 
     return subject_dict
+
 
 def create_haps(path_pmug):
     subject_dict = create_subject_dict(path_pmug)
@@ -79,10 +87,10 @@ def create_haps(path_pmug):
         res_haps = {"Haps": [], "Probs": [], "Pops": []}
         rows = subject_dict[id]
         for row in rows:
-            row = row.split(',')
-            pair1 = str(row[1]).split(';')
+            row = row.split(",")
+            pair1 = str(row[1]).split(";")
             haps1, pops1 = pair1[0], pair1[1]
-            pair2 = str(row[2]).split(';')
+            pair2 = str(row[2]).split(";")
             haps2, pops2 = pair2[0], pair2[1]
             prob = float(row[3])
 
@@ -95,6 +103,7 @@ def create_haps(path_pmug):
 
     return all_haps
 
+
 def is_subarray_unordered(large_array, small_array):
     # Convert arrays to sets
     set_large = set(large_array)
@@ -102,6 +111,7 @@ def is_subarray_unordered(large_array, small_array):
 
     # Check if all elements of small_array are in large_array
     return set_small.issubset(set_large)
+
 
 def write_best_hap_race_pairs(name_gl, haps, pops, probs, fout, numOfReasults):
     all_res = []
@@ -111,7 +121,7 @@ def write_best_hap_race_pairs(name_gl, haps, pops, probs, fout, numOfReasults):
         all_res.append([probs[i], pair])
     all_res.sort(key=lambda x: x[0], reverse=True)
     # write the output to file
-    minBestResult = min(numOfReasults,len(all_res))
+    minBestResult = min(numOfReasults, len(all_res))
     for k in range(minBestResult):
         fout.write(
             name_gl
@@ -123,7 +133,9 @@ def write_best_hap_race_pairs(name_gl, haps, pops, probs, fout, numOfReasults):
             + str(k)
             + "\n"
         )
-def write_best_prob(name_gl, res, probs, fout,number_of_pop_results ,sign=","):
+
+
+def write_best_prob(name_gl, res, probs, fout, number_of_pop_results, sign=","):
     sumProbsDict = defaultdict(list)
     # loop over the result and sum the prob by populations/haplotype
     for k in range(len(res)):
@@ -139,7 +151,6 @@ def write_best_prob(name_gl, res, probs, fout,number_of_pop_results ,sign=","):
             else:
                 sumProbsDict[key] = probs[k]
 
-
     multProbs = []
     for k in sumProbsDict:
         multProbs.append([sumProbsDict[k], [k, sumProbsDict[k]]])
@@ -147,7 +158,7 @@ def write_best_prob(name_gl, res, probs, fout,number_of_pop_results ,sign=","):
     multProbs.sort(key=lambda x: x[0], reverse=True)
 
     # write the output to file
-    minBestResult =min(len(multProbs),number_of_pop_results)
+    minBestResult = min(len(multProbs), number_of_pop_results)
     for k in range(minBestResult):
         fout.write(
             name_gl
@@ -160,15 +171,15 @@ def write_best_prob(name_gl, res, probs, fout,number_of_pop_results ,sign=","):
             + "\n"
         )
 
-def write_umug(id,res_haps,fout,numOfResults):
 
+def write_umug(id, res_haps, fout, numOfResults):
     res_muugs = {}
-    for idx ,hap in enumerate(res_haps["Haps"]):
-        hap1,hap2 = res_haps["Haps"][idx][0], res_haps["Haps"][idx][1]
+    for idx, hap in enumerate(res_haps["Haps"]):
+        hap1, hap2 = res_haps["Haps"][idx][0], res_haps["Haps"][idx][1]
         prob = res_haps["Probs"][idx]
         haps = []
-        haps.append(hap1.split('~'))
-        haps.append(hap2.split('~'))
+        haps.append(hap1.split("~"))
+        haps.append(hap2.split("~"))
         muug = ""
         for i in range(len(haps[0])):
             sort_hap = sorted([haps[0][i], haps[1][i]])
@@ -182,27 +193,21 @@ def write_umug(id,res_haps,fout,numOfResults):
     for key in res_muugs.keys():
         pairs.append((key, res_muugs[key]))
     pairs = sorted(pairs, key=lambda x: x[1], reverse=True)
-    minResults = min(numOfResults,len(pairs))
+    minResults = min(numOfResults, len(pairs))
     for k in range(minResults):
         fout.write(
-            id
-            + ","
-            + str(pairs[k][0])
-            + ","
-            + str(pairs[k][1])
-            + ","
-            + str(k)
-            + "\n"
+            id + "," + str(pairs[k][0]) + "," + str(pairs[k][1]) + "," + str(k) + "\n"
         )
 
-def write_umug_pops(id,res_haps,fout,numOfResults):
+
+def write_umug_pops(id, res_haps, fout, numOfResults):
     res_muugs = {}
-    for idx,pop in enumerate(res_haps["Haps"]):
-        pop1,pop2 = res_haps["Pops"][idx][0], res_haps["Pops"][idx][1]
+    for idx, pop in enumerate(res_haps["Haps"]):
+        pop1, pop2 = res_haps["Pops"][idx][0], res_haps["Pops"][idx][1]
         prob = res_haps["Probs"][idx]
-        pops = [pop1,pop2]
+        pops = [pop1, pop2]
         pops = sorted(pops)
-        muug = pops[0]+','+pops[1]
+        muug = pops[0] + "," + pops[1]
         if muug in res_muugs.keys():
             res_muugs[muug] += prob
         else:
@@ -211,48 +216,50 @@ def write_umug_pops(id,res_haps,fout,numOfResults):
     for key in res_muugs.keys():
         pairs.append((key, res_muugs[key]))
     pairs = sorted(pairs, key=lambda x: x[1], reverse=True)
-    minResults = min(numOfResults,len(pairs))
+    minResults = min(numOfResults, len(pairs))
     for k in range(minResults):
         fout.write(
-            id
-            + ","
-            + str(pairs[k][0])
-            + ","
-            + str(pairs[k][1])
-            + ","
-            + str(k)
-            + "\n"
+            id + "," + str(pairs[k][0]) + "," + str(pairs[k][1]) + "," + str(k) + "\n"
         )
 
-def write_filter(subject_id,res_haps,fout_hap_haplo,fout_pop_haplo,fout_hap_muug,fout_pop_muug,number_of_results,number_of_pop_results,MUUG_output,haps_output):
+
+def write_filter(
+    subject_id,
+    res_haps,
+    fout_hap_haplo,
+    fout_pop_haplo,
+    fout_hap_muug,
+    fout_pop_muug,
+    number_of_results,
+    number_of_pop_results,
+    MUUG_output,
+    haps_output,
+):
     haps = res_haps["Haps"]
     probs = res_haps["Probs"]
     pops = res_haps["Pops"]
     if haps_output:
         write_best_hap_race_pairs(
-            subject_id,
-            haps,
-            pops,
-            probs,
-            fout_hap_haplo,
-            number_of_results
+            subject_id, haps, pops, probs, fout_hap_haplo, number_of_results
         )
-        write_best_prob(subject_id, pops, probs, fout_pop_haplo,1)
+        write_best_prob(subject_id, pops, probs, fout_pop_haplo, 1)
     if MUUG_output:
-        write_umug(subject_id,res_haps,fout_hap_muug,number_of_results)
-        write_umug_pops(subject_id,res_haps,fout_pop_muug,number_of_pop_results)
+        write_umug(subject_id, res_haps, fout_hap_muug, number_of_results)
+        write_umug_pops(subject_id, res_haps, fout_pop_muug, number_of_pop_results)
 
 
-def change_output_by_extra_gl(config,gls,path_pmug,path_umug,path_umug_pops,path_pmug_pops,path_miss):
+def change_output_by_extra_gl(
+    config, gls, path_pmug, path_umug, path_umug_pops, path_pmug_pops, path_miss
+):
     res_haps = create_haps(path_pmug)
     all_data = {"subject_id": [], "res_haps": [], "extra_gl": [], "short_gl": []}
 
-    if is_subarray_unordered(gls["subject_id"],res_haps["subject_id"]):
-        ids= []
+    if is_subarray_unordered(gls["subject_id"], res_haps["subject_id"]):
+        ids = []
         haps = []
         extras = []
         shorts = []
-        for idx,id in enumerate(res_haps["subject_id"]):
+        for idx, id in enumerate(res_haps["subject_id"]):
             ids.append(id)
             haps.append(res_haps["res_haps"][idx])
             gl_idx = gls["subject_id"].index(id)
@@ -270,29 +277,40 @@ def change_output_by_extra_gl(config,gls,path_pmug,path_umug,path_umug_pops,path
     number_of_results = config["number_of_results"]
     number_of_pop_results = config["number_of_pop_results"]
 
-    fout_hap_haplo,fout_pop_haplo,fout_hap_muug,fout_pop_muug ="","","",""
+    fout_hap_haplo, fout_pop_haplo, fout_hap_muug, fout_pop_muug = "", "", "", ""
 
     if haps_output:
         fout_hap_haplo = open(path_pmug, "w")
-        fout_pop_haplo = open(path_pmug_pops,"w")
+        fout_pop_haplo = open(path_pmug_pops, "w")
     if MUUG_output:
-        fout_hap_muug = open(path_umug,"w")
-        fout_pop_muug = open(path_umug_pops,"w")
-    miss = open(path_miss,"a")
+        fout_hap_muug = open(path_umug, "w")
+        fout_pop_muug = open(path_umug_pops, "w")
+    miss = open(path_miss, "a")
 
-    for idx,id in enumerate(all_data["subject_id"]):
-        subject_id =  id
+    for idx, id in enumerate(all_data["subject_id"]):
+        subject_id = id
         res_haps = all_data["res_haps"][idx]
         extra_gl = all_data["extra_gl"][idx]
 
         if len(extra_gl) > 0:
             res_haps = filter_results(res_haps, extra_gl)
 
-        if len(res_haps["Haps"]) == 0 :
+        if len(res_haps["Haps"]) == 0:
             gl_idx = gls["subject_id"].index(subject_id)
             miss.write(str(gl_idx) + "," + str(subject_id) + "\n")
         else:
-            write_filter(subject_id, res_haps, fout_hap_haplo, fout_pop_haplo, fout_hap_muug, fout_pop_muug,number_of_results,number_of_pop_results,MUUG_output,haps_output)
+            write_filter(
+                subject_id,
+                res_haps,
+                fout_hap_haplo,
+                fout_pop_haplo,
+                fout_hap_muug,
+                fout_pop_muug,
+                number_of_results,
+                number_of_pop_results,
+                MUUG_output,
+                haps_output,
+            )
 
     if MUUG_output:
         fout_hap_muug.close()
