@@ -55,7 +55,6 @@ def graph_freqs(conf_file="", for_em=False, em_pop=None):
 
 
 def impute(conf_file="", hap_pop_pair=False, graph=None):
-
     project_dir_in_file, project_dir_graph = "", ""
     if conf_file == "":
 
