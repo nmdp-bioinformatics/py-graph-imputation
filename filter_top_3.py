@@ -1,6 +1,9 @@
 def extract_locuses(haplotype):
     """Get one haplotype and return its locuses"""
-    return [element[:4] if element[:3].isalpha() else element[0] for element in haplotype.split("^")]
+    return [
+        element[:4] if element[:3].isalpha() else element[0]
+        for element in haplotype.split("^")
+    ]
 
 
 def get_3_dominant_locuses(locuses, threshold=3):
@@ -67,7 +70,12 @@ def filter_haplotype(haplotype, dominant_locuses):
     """Filter haplotype by the dominant locuses"""
     haplotype = haplotype.split("^")
     return "^".join(
-        [element for element in haplotype if (element[:4] in dominant_locuses) or (element[0] in dominant_locuses)])
+        [
+            element
+            for element in haplotype
+            if (element[:4] in dominant_locuses) or (element[0] in dominant_locuses)
+        ]
+    )
 
 
 def split_gl(subject_gl):
@@ -88,7 +96,7 @@ def change_donor_file(path):
         lines = file.readlines()
 
     modified_lines = []
-    gls = {"subject_id":[],"short_gl":[],"extra_gl":[]}
+    gls = {"subject_id": [], "short_gl": [], "extra_gl": []}
     for name_gl in lines:
         name_gl = name_gl.rstrip()  # remove trailing whitespace
         if "," in name_gl:
@@ -101,9 +109,9 @@ def change_donor_file(path):
             subject_gl = list_gl[1]
 
             short_gl, extra_gl = split_gl(subject_gl)
-            extra_gl = extra_gl.replace('g', '')
+            extra_gl = extra_gl.replace("g", "")
             # gl = gl.replace('N', '')
-            extra_gl = extra_gl.replace('L', '')
+            extra_gl = extra_gl.replace("L", "")
 
             gls["subject_id"].append(id_gl)
             gls["short_gl"].append(short_gl)
@@ -117,4 +125,4 @@ def change_donor_file(path):
         for line in modified_lines:
             file.write(line + "\n")
     file.close()
-    return gls , lines
+    return gls, lines
