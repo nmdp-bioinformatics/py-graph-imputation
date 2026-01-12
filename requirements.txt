@@ -1,4 +1,5 @@
-cython==0.29.32
+setuptools
+cython==0.29.37
 numpy>=1.20.2
 pandas
 tqdm
