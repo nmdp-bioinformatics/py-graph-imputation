@@ -52,7 +52,7 @@ with open("requirements-tests.txt") as requirements_file:
 
 setup(
     name="py-graph-imputation",
-    version="0.1.2",
+    version="0.1.3",
     author="Pradeep Bashyal",
     author_email="pbashyal@nmdp.org",
     python_requires=">=3.8",
