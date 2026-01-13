@@ -1,5 +1,6 @@
 setuptools
-cython==3.2.4
+Cython==3.2.4
 numpy>=1.20.2
 pandas
 tqdm
+legacy-cgi

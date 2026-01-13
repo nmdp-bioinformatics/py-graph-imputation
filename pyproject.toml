@@ -1,3 +1,2 @@
 [build-system]
-# Minimum requirements for the build system to execute.
-requires = ["setuptools", "wheel", "cython==0.29.32"]  # PEP 508 specifications.
+requires = ["setuptools", "wheel", "Cython==3.2.4", "legacy-cgi", "tqdm", "legacy-cgi", "numpy>=1.20.2",  "pandas"]
