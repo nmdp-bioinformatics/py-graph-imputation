@@ -25,6 +25,7 @@ def run_original_grim(
 
     # first step in py-graph-imputation
     if Producehpf:
+
         produce_hpf(conf_file=path_configuration)
 
         path_hpf = config["freq_file"]
