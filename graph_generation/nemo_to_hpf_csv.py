@@ -89,6 +89,6 @@ with open(hpf_file, mode="w") as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=",", quoting=csv.QUOTE_NONE)
     csv_writer.writerow(header)
     for pop_haplotype in pop_hap_combos:
-        (pop, haplotype) = pop_haplotype.split("-")
+        pop, haplotype = pop_haplotype.split("-")
         freq = pop_hap_combos[pop_haplotype]
         csv_writer.writerow([haplotype, pop, freq])
