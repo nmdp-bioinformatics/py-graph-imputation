@@ -22,4 +22,3 @@
 
 __author__ = """Martin Maiers"""
 __email__ = "mmaiers@nmdp.org"
-__version__ = "0.1.13.dev1"
