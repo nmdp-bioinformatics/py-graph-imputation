@@ -26,4 +26,4 @@
 """Top-level package for py-grim."""
 
 __organization__ = "NMDP/CIBMTR Bioinformatics"
-__version__ = "0.1.14"
+__version__ = "1.0.0"
