@@ -4,3 +4,6 @@ numpy>=1.20.2
 pandas
 tqdm
 legacy-cgi
+streamlit>=1.28.0
+flask>=2.3.0
+flask-cors>=4.0.0
