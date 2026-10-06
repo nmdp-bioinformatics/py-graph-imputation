@@ -97,8 +97,17 @@ class Graph(object):
                     node2_id = row[1]
                     node1 = nodesDict[node1_id]
                     node2 = nodesDict[node2_id]
-                    node1_label = self.Whole_Vertices_attributes[node1][0]
-                    node2_label = self.Whole_Vertices_attributes[node2][0]
+                    node1_attr = self.Whole_Vertices_attributes[node1]
+                    node2_attr = self.Whole_Vertices_attributes[node2]
+                    node1_label = node1_attr[0]
+                    node2_label = node2_attr[0]
+                    # Whole_Edges is consumed as positional indices into
+                    # Whole_Vertices (self.Whole_Vertices[self.Whole_Edges[...]]),
+                    # so edges must reference vertex POSITIONS, not the raw CSV
+                    # node ids. The position of each real vertex is stored as the
+                    # third element of its attribute tuple.
+                    node1_pos = node1_attr[2]
+                    node2_pos = node2_attr[2]
 
                     if len(node1_label) < len(node2_label):
                         # Create a connector
@@ -109,12 +118,12 @@ class Graph(object):
                             connector_id = len(self.Whole_Vertices) - 1
                             self.Whole_Vertices_attributes[connector] = connector_id
 
-                            self.Whole_Edges.append([node1_id, connector_id])
+                            self.Whole_Edges.append([node1_pos, connector_id])
                         else:
                             connector_id = self.Whole_Vertices_attributes[connector]
 
                         # Append the connector to the whole edges array
-                        self.Whole_Edges.append([connector_id, node2_id])
+                        self.Whole_Edges.append([connector_id, node2_pos])
 
                     else:
                         # Create a connector
@@ -126,8 +135,8 @@ class Graph(object):
                             self.Whole_Vertices_attributes[connector] = connector_id
 
                         # Append the connector to the whole edges array
-                        self.Whole_Edges.append([node2_id, connector_id])
-                        self.Whole_Edges.append([connector_id, node1_id])
+                        self.Whole_Edges.append([node2_pos, connector_id])
+                        self.Whole_Edges.append([connector_id, node1_pos])
 
         nodesDict.clear()
         del nodesDict
@@ -229,8 +238,13 @@ class Graph(object):
                     hapsList.append(haplotype)
         elif label in self.nodes_plan_b:
             for haplotype, hap_label in self.Whole_Vertices_attributes.items():
-                hap_label = hap_label[0]
-                if hap_label == label:
+                # Whole_Vertices_attributes holds two kinds of values: real
+                # haplotype vertices map to a (label, probs, id) tuple, while
+                # connector nodes added during graph build map to a bare int id.
+                # Only the real haplotypes carry a label, so skip connectors.
+                if not isinstance(hap_label, tuple):
+                    continue
+                if hap_label[0] == label:
                     hapsList.append(haplotype)
         self.labelDict[label] = hapsList
         return hapsList

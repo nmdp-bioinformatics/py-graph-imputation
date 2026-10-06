@@ -4,6 +4,7 @@
 * [Graph Imputation](#graph-imputation)
 * [Development](#develop)
 * [Running A Minimal Example Imputation](#running-a-minimal-configuration-example)
+* [Running A 9-Locus Example Imputation](#running-a-9-locus-example)
 
 ### Graph Imputation
 
@@ -262,3 +263,69 @@ The format of the `.pops` files is (csv):
 * pop2
 * frequency
 * rank
+
+
+### Running an ML GRIM example
+### ML GRIM
+
+The example above supports up to 6 loci. For imputations involving more than 6 loci, **ML GRIM** should be used instead.
+
+ML GRIM can be run as follows:
+
+```python
+from grim.RunGrim import run_original_grim
+
+run_original_grim(
+    path_configuration="conf/minimal-configuration.json",
+    hap_pop_pair=True,
+    Producehpf=True,
+    dominant3=True
+)
+```
+
+Where:
+
+* `path_configuration` – Path to the GRIM configuration file.
+* `hap_pop_pair` – Controls how phased haplotype results are written:
+
+  * `True` – Each haplotype is paired with its inferred population in the output (e.g. `hap1;pop1,hap2;pop2`).
+  * `False` – Haplotype pairs and population-pair probabilities are aggregated and written separately.
+* `Producehpf` – Controls whether the HPF (Haplotype-Population-Frequency) file is generated before graph construction:
+
+  * `True` – Generates a new HPF file from the configured frequency data.
+  * `False` – Uses the existing HPF file specified in the configuration.
+* `dominant3` – Controls whether the input typing is reduced before imputation:
+
+  * `True` – Uses the three dominant/most important GLs for the initial imputation and then filters the resulting candidates using the remaining GL information.
+  * `False` – Runs the imputation directly on the input typing without this reduction/filtering step.
+
+#### Multiprocessing
+
+ML GRIM can impute multiple subjects in parallel. The number of worker processes can be configured by adding the `num_processes` field to the configuration file:
+
+```json
+{
+    "...": "...",
+    "num_processes": 4
+}
+```
+
+The value determines how many subjects can be imputed concurrently:
+
+* `"num_processes": 1` – Runs sequentially in a single process.
+* `"num_processes": N` where `N > 1` – Runs up to `N` subjects in parallel using `N` worker processes.
+
+For example:
+
+```json
+{
+    "...": "...",
+    "num_processes": 8
+}
+```
+
+will use 8 worker processes, with each worker imputing a different subject.
+
+The imputation graph is built only once. Worker processes are created using `fork` and share the already-built graph through copy-on-write memory, avoiding a separate full copy of the graph for every worker. Therefore, increasing `processes` primarily increases CPU utilization rather than duplicating the graph in memory.
+
+Multiprocessing is performed **across subjects**, not within a single subject. Therefore, it is most useful when imputing many subjects; a single subject will not become faster simply by increasing the number of processes.

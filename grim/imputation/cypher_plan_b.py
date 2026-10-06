@@ -37,6 +37,8 @@ class CypherQueryPlanB(object):
         return self.loc_map[loc_allele[0]]
 
     def findLinkType(self, typing):
+        # loc_map maps a locus name to its integer index, so sort numerically
+        # and only then stringify - graph labels are digit strings like "123".
         loci = sorted([self.getLocus(a) for a in typing[0].split("~")])
-        loci_lc = "".join([allele for allele in loci])
+        loci_lc = "".join([str(locus) for locus in loci])
         return loci_lc
