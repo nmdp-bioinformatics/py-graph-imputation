@@ -132,7 +132,7 @@ def test_counts_use_cohort_size_and_default_to_one(tmp_path):
     make_hfx(tmp_path, "big", cohort_size=300)
     make_hfx(tmp_path, "unknown", cohort_size=0)
     produce_hpf_from_hfx(conf_for(tmp_path, ["big", "unknown"]))
-    (big, unknown) = read_counts(tmp_path)
+    big, unknown = read_counts(tmp_path)
     assert big[:2] == ["big", "300.0"]
     assert unknown[:2] == ["unknown", "1.0"]
     assert float(big[2]) == pytest.approx(300 / 301)
