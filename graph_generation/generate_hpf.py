@@ -10,6 +10,21 @@ def produce_hpf(conf_file):
     with open(conf_file) as f:
         conf = json.load(f)
 
+    # "freqs" (default): <POP>.freqs.gz files; "hfx": <POP>.hfx bundles.
+    freq_source_type = conf.get("freq_source_type", "freqs")
+    if freq_source_type == "hfx":
+        try:
+            from graph_generation.generate_hpf_from_hfx import produce_hpf_from_hfx
+        except ImportError:  # run as a script from inside graph_generation/
+            from generate_hpf_from_hfx import produce_hpf_from_hfx
+        return produce_hpf_from_hfx(conf, project_dir)
+    if freq_source_type != "freqs":
+        raise ValueError(
+            "freq_source_type must be 'freqs' or 'hfx', got {!r}".format(
+                freq_source_type
+            )
+        )
+
     pops = conf.get("populations")
     freq_data_dir = project_dir + conf.get("freq_data_dir")
     output_dir = project_dir + conf.get("graph_files_path")

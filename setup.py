@@ -67,6 +67,7 @@ setup(
     ],
     description="Graph Based Imputation",
     install_requires=requirements,
+    extras_require={"hfx": ["hfx-tools"]},
     license="LGPL 3.0",
     long_description=readme + "\n\n" + history,
     long_description_content_type="text/markdown",
