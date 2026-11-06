@@ -62,6 +62,32 @@ output
 `-- pop_counts_file.txt             # Size of each population
 ```
 
+#### Use HFX bundles as the frequency source
+
+Frequencies can also come from [HFX](https://github.com/societyforimmunepolymorphism/hfx)
+(Haplotype Frequency Exchange) bundles instead of `.freqs.gz` files. Install the optional
+reader (`pip install "py-graph-imputation[hfx]"`) and set `freq_source_type` in the
+configuration file; each population is then read from `<freq_data_dir>/<population>.hfx`:
+
+```
+"populations": ["hfset-1"],
+"freq_source_type": "hfx",
+"freq_data_dir": "data/hfx",
+```
+
+`produce_hpf` writes the same `hpf.csv` and population counts file as before, so the
+graph generation and imputation steps are unchanged. Notes:
+
+* `"freq_source_type": "freqs"` (the default) keeps reading `.freqs.gz` files.
+* Haplotypes are written with their alleles in alphabetical locus order, which is the order the
+  imputation engine looks them up in; number `loci_map` the same way (`A`=1, `B`=2, `C`=3,
+  `DQB1`=4, `DRB1`=5). `graph_generation.generate_hpf_from_hfx.hfx_loci_map(path)` returns that
+  map for a bundle.
+* The count recorded for a population is the bundle's cohort size, so `freq_trim_threshold` is
+  an expected-count cutoff. A bundle without a cohort size (`cohortSize` 0) counts as 1.0, which
+  makes the trim an absolute frequency cutoff.
+* Population names may contain `-` (the `.freqs.gz` reader cannot handle that).
+
 #### Generate the Graph (nodes and edges) files
 
 ```
