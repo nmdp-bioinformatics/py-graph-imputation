@@ -183,3 +183,5 @@ data/freqs/counts.txt
 data/subjects/donor.imp.csv
 data/subjects/hla.csv
 data/subjects/us.18.60.csv.gz
+
+graphs/

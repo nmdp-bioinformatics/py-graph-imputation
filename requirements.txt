@@ -7,3 +7,11 @@ legacy-cgi
 streamlit>=1.28.0
 flask>=2.3.0
 flask-cors>=4.0.0
+flasgger>=0.9.7
+# Production WSGI server for multi-worker deployment (see README.server.md).
+gunicorn>=21.2.0
+# HLA nomenclature / ambiguity expansion (XX codes, MAC codes, serology).
+py-ard>=2.0.0
+# HFX bundle reader (structured frequency source). Install from the hfx-tools repo:
+#   pip install -e /path/to/hfx-tools
+hfx-tools
