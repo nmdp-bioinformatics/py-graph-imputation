@@ -28,6 +28,18 @@ from grim.imputation.networkx_graph import Graph
 logger = logging.getLogger("imputation_service")
 
 
+# Every allele in a GL string must look like LOCUS*FIELDS (e.g. A*02:01,
+# DRB1*11:XX, B*44:AB). Used by the API layers to reject malformed input with a
+# clear 400 instead of a generic "allele '' not in graph" problem.
+_ALLELE_RE = re.compile(r"^[A-Z][A-Z0-9]*\*[A-Za-z0-9:]+$")
+
+
+def find_malformed_alleles(gl_string):
+    """Return the tokens of a GL string that are not syntactically alleles."""
+    tokens = re.split(r"[\^+/~|]", (gl_string or "").strip())
+    return [t for t in tokens if not _ALLELE_RE.match(t.strip())]
+
+
 # ---------------------------------------------------------------------------
 # py-ard integration (ambiguity expansion: XX codes, MAC codes, serology, ...)
 # ---------------------------------------------------------------------------
