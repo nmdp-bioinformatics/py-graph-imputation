@@ -74,6 +74,7 @@ setup(
     include_package_data=True,
     keywords="grim",
     scripts=["scripts/build-imputation-validation.sh", "scripts/runfile.py"],
+    py_modules=["imputation_service"],
     packages=find_packages(
         include=[
             "grim",
