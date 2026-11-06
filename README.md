@@ -88,6 +88,35 @@ graph generation and imputation steps are unchanged. Notes:
   makes the trim an absolute frequency cutoff.
 * Population names may contain `-` (the `.freqs.gz` reader cannot handle that).
 
+#### Impute single GL strings in memory
+
+`imputation_service.ImputationService` loads a configuration and builds the graph once, then
+imputes individual GL strings on demand without reading or writing files. It works with any
+frequency source, including the HFX bundles above:
+
+```python
+from graph_generation.generate_hpf import produce_hpf
+from grim.grim import graph_freqs
+from imputation_service import ImputationService
+
+produce_hpf(conf_file="conf/hfx.json")
+graph_freqs(conf_file="conf/hfx.json")
+svc = ImputationService("conf/hfx.json")
+result = svc.impute("A*01:01+A*02:01^B*07:02+B*08:01", pop1="hfset-1", output="umug")
+result["umug"]["genotypes"]   # [{"rank": 0, "genotype": "...", "frequency": ..., "probability": ...}]
+```
+
+* Inputs are 2-field alleles. By default each input is first reduced with
+  [py-ard](https://pypi.org/project/py-ard/) (`lgx`), which expands XX and MAC codes, serology and
+  3/4-field alleles; install it with `pip install "py-graph-imputation[expand]"`. 1-field alleles
+  (`A*01`) and the `g` suffix (`A*01:01g`) are not accepted by py-ard: write 1-field alleles as
+  `A*01:XX` and drop the `g`. Pass `expand=False` to skip py-ard when the input is already 2-field.
+* A locus that is left out is imputed from the frequencies.
+* `probability` is each returned genotype's share of the returned results (they sum to 1);
+  `frequency` is the genotype frequency under the graph.
+* `graph_freqs` reads `sys.argv` with `argparse`, so a program with its own command-line arguments
+  should set `sys.argv = [name]` around the call.
+
 #### Generate the Graph (nodes and edges) files
 
 ```

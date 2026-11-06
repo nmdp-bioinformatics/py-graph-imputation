@@ -67,13 +67,14 @@ setup(
     ],
     description="Graph Based Imputation",
     install_requires=requirements,
-    extras_require={"hfx": ["hfx-tools"]},
+    extras_require={"hfx": ["hfx-tools"], "expand": ["py-ard"]},
     license="LGPL 3.0",
     long_description=readme + "\n\n" + history,
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="grim",
     scripts=["scripts/build-imputation-validation.sh", "scripts/runfile.py"],
+    py_modules=["imputation_service"],
     packages=find_packages(
         include=[
             "grim",
