@@ -184,10 +184,11 @@ def _read_graph_loci_map(node_file):
         path = Path(node_file)
         if not path.is_file():
             return None
-        best_loci = []
+        best_width = 0
+        loci_map = {}
         with open(path) as f:
             header = f.readline()  # skip header
-            # Scan a bounded number of rows; the first full-width node is enough.
+            # Scan a bounded number of rows; full-width nodes define the order.
             for count, line in enumerate(f):
                 parts = line.rstrip("\n").split(",")
                 if len(parts) < 2:
@@ -195,14 +196,26 @@ def _read_graph_loci_map(node_file):
                 name = parts[1]
                 alleles = name.split("~")
                 loci = [a.split("*")[0] for a in alleles if "*" in a]
-                if len(loci) > len(best_loci):
-                    best_loci = loci
-                # Stop once we've seen enough rows or found a wide node.
+                if len(loci) > best_width:
+                    best_width = len(loci)
+                    loci_map = {}
+                # Record every locus name seen at each position of a full-width
+                # node (a slot like DRB3/4/5 can hold different names).
+                if len(loci) == best_width:
+                    for i, locus in enumerate(loci):
+                        loci_map.setdefault(locus, i + 1)
                 if count > 5000:
                     break
-        if not best_loci:
+        if not loci_map:
             return None
-        return {locus: i + 1 for i, locus in enumerate(best_loci)}
+        # DRB3/DRB4/DRB5/DRBX share one slot; make sure all names resolve to it.
+        drb345 = [
+            loci_map[l] for l in ("DRB3", "DRB4", "DRB5", "DRBX") if l in loci_map
+        ]
+        if drb345:
+            for l in ("DRB3", "DRB4", "DRB5", "DRBX"):
+                loci_map[l] = drb345[0]
+        return loci_map
     except OSError:
         return None
 
@@ -347,7 +360,7 @@ def build_config(conf_file):
     # Ensure the Plan B matrix covers every locus index. The stock config
     # matrix only references indices 1..5; on a 6+ locus graph that would omit
     # loci from the fallback. Regenerate a matching matrix when needed.
-    n_loci = len(loci_map)
+    n_loci = len(set(loci_map.values()))
     max_index_in_matrix = 0
     for grouping in config["matrix_planb"]:
         for group in grouping:

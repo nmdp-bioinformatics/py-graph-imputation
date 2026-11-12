@@ -83,7 +83,8 @@ def test_attach_expansion_when_expanded():
         expand_note=None,
     )
     assert resp["expanded"] is True
-    assert resp["input_gl_string"] == "A*01:XX+A*02:01"
+    # GL string values are no longer returned in the response.
+    assert "input_gl_string" not in resp
     assert "expand_note" not in resp
 
 
@@ -111,6 +112,34 @@ def test_attach_expansion_records_note():
     )
     assert resp["expand_note"] == "py-ard not available; codes not expanded"
     assert "expanded" not in resp
+
+
+def test_attach_expansion_records_homozygous_filled():
+    resp = {"gl_string": "A*01:01+A*01:01^B*08:01+B*08:01"}
+    svc.ImputationService._attach_expansion(
+        resp,
+        original_gl_string="A*01:01^B*08:01",
+        gl_expanded=False,
+        expand_note=None,
+        gl_homozygous_filled=True,
+    )
+    assert resp["homozygous_filled"] is True
+    assert "input_gl_string" not in resp
+    assert "expanded" not in resp
+
+
+def test_attach_expansion_expanded_and_homozygous():
+    resp = {"gl_string": "A*01:01/A*01:02+A*01:01/A*01:02^B*08:01+B*08:01"}
+    svc.ImputationService._attach_expansion(
+        resp,
+        original_gl_string="A*01:XX^B*08:XX",
+        gl_expanded=True,
+        expand_note=None,
+        gl_homozygous_filled=True,
+    )
+    assert resp["expanded"] is True
+    assert resp["homozygous_filled"] is True
+    assert "input_gl_string" not in resp
 
 
 # ---------------------------------------------------------------------------
@@ -146,3 +175,49 @@ def test_expand_gl_string_expands_xx_code():
     assert "A*01:01" in out
     # 2-field lgx reduction: no 3rd field like ':01:01' in the expansion.
     assert "A*01:XX" not in out
+
+
+# ---------------------------------------------------------------------------
+# normalize_homozygous_loci: single-allele loci -> homozygous genotype (X+X)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "gl_string,expected,changed",
+    [
+        # Each locus a single allele -> duplicated into a homozygous genotype.
+        ("A*01:01^B*08:01", "A*01:01+A*01:01^B*08:01+B*08:01", True),
+        # Single locus, single allele.
+        ("A*01:01", "A*01:01+A*01:01", True),
+        # Already full genotypes -> unchanged.
+        (
+            "A*01:01+A*02:01^B*07:02+B*08:01",
+            "A*01:01+A*02:01^B*07:02+B*08:01",
+            False,
+        ),
+        # Mixed: one full locus, one single-allele locus.
+        (
+            "A*01:01+A*02:01^B*08:01",
+            "A*01:01+A*02:01^B*08:01+B*08:01",
+            True,
+        ),
+        # A single '/'-ambiguity list at a locus is one slot -> duplicated.
+        (
+            "A*01:01/A*01:02^B*08:01",
+            "A*01:01/A*01:02+A*01:01/A*01:02^B*08:01+B*08:01",
+            True,
+        ),
+        ("", "", False),
+    ],
+)
+def test_normalize_homozygous_loci(gl_string, expected, changed):
+    out, was_changed = svc.normalize_homozygous_loci(gl_string)
+    assert out == expected
+    assert was_changed is changed
+
+
+def test_normalize_homozygous_loci_leading_plus():
+    """A leading '+' (empty first haplotype) is stripped like the engine does."""
+    out, changed = svc.normalize_homozygous_loci("+A*01:01^B*08:01")
+    assert out == "A*01:01+A*01:01^B*08:01+B*08:01"
+    assert changed is True

@@ -47,6 +47,10 @@ except ImportError:  # pragma: no cover - hfx_tools optional at import time
     HFX_AVAILABLE = False
 
 
+# Locus names that share the single DRB3/4/5 haplotype slot in 9-locus HFX data.
+DRB345_LOCI = ("DRB3", "DRB4", "DRB5", "DRBX")
+
+
 def hfx_loci_map(hfx_path):
     """
     Read an HFX bundle's metadata and return a positional loci_map
@@ -67,7 +71,26 @@ def hfx_loci_map(hfx_path):
         loci = [a.split("*")[0] for a in bundle.rows[0][0].split("~")]
     if not loci:
         raise ValueError(f"Could not determine loci from HFX bundle: {hfx_path}")
-    return {locus: i + 1 for i, locus in enumerate(loci)}
+    # 9-locus HFX haplotypes carry a single DRB3/4/5 slot (the allele may be
+    # DRB3*, DRB4*, DRB5* or the DRBX*NNNN placeholder), but the bundle
+    # metadata lists them as separate loci. Collapse them onto ONE position so
+    # the graph has 9 positions; several names may share an index.
+    loci_map = {}
+    drb345_idx = None
+    pos = 0
+    for locus in loci:
+        if locus in DRB345_LOCI:
+            if drb345_idx is None:
+                pos += 1
+                drb345_idx = pos
+            loci_map[locus] = drb345_idx
+        else:
+            pos += 1
+            loci_map[locus] = pos
+    if drb345_idx is not None:
+        for locus in DRB345_LOCI:
+            loci_map.setdefault(locus, drb345_idx)
+    return loci_map
 
 
 def _hfx_cohort_size(bundle):
@@ -192,7 +215,8 @@ def build_generation_config(
     graph_dir = Path(graphs_root) / name
     csv_dir = graph_dir / "csv"
 
-    n_loci = len(loci_map)
+    # Several locus names may share one position (DRB3/4/5/X) -> count positions.
+    n_loci = len(set(loci_map.values()))
     config = {
         "populations": list(populations),
         "freq_trim_threshold": freq_trim_threshold,
