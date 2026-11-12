@@ -277,7 +277,7 @@ def change_output_by_extra_gl(
     number_of_results = config["number_of_results"]
     number_of_pop_results = config["number_of_pop_results"]
 
-    fout_hap_haplo, fout_pop_haplo, fout_hap_muug, fout_pop_muug = "", "", "", ""
+    fout_hap_haplo = fout_pop_haplo = fout_hap_muug = fout_pop_muug = None
 
     if haps_output:
         fout_hap_haplo = open(path_pmug, "w")
@@ -312,10 +312,151 @@ def change_output_by_extra_gl(
                 haps_output,
             )
 
-    if MUUG_output:
+    if fout_hap_muug is not None:
         fout_hap_muug.close()
+    if fout_pop_muug is not None:
         fout_pop_muug.close()
-    if haps_output:
+    if fout_hap_haplo is not None:
         fout_hap_haplo.close()
+    if fout_pop_haplo is not None:
         fout_pop_haplo.close()
     miss.close()
+
+
+def _build_extra_gl_dict(extra_gl):
+    """Parse `extra_gl` into {locus: [alleles on one chromosome, on the other]}."""
+    return {
+        locus.split("*")[0]: [
+            set(locus.split("+")[0].split("/")),
+            set(locus.split("+")[1].split("/")),
+        ]
+        for locus in extra_gl.split("^")
+    }
+
+
+def filter_muug_results(res_muugs, extra_gl):
+    """Drop the aggregated genotypes that `extra_gl` rules out.
+
+    A MUUG key carries the same alleles as a phased pair, sorted within each
+    locus, so a genotype survives when every locus the donor was typed for
+    holds the two observed alleles - in either order, since the sort has
+    already thrown the phase away.
+    """
+    dct = _build_extra_gl_dict(extra_gl)
+
+    haps = {}
+    for muug, prob in res_muugs["Haps"].items():
+        check = True
+        for genotype in muug.split("^"):
+            allele1, allele2 = genotype.split("+")
+            loc = allele1.split("*")[0]
+            if loc in dct:
+                if not (
+                    (allele1 in dct[loc][0] and allele2 in dct[loc][1])
+                    or (allele1 in dct[loc][1] and allele2 in dct[loc][0])
+                ):
+                    check = False
+                    break
+        if check:
+            haps[muug] = prob
+    res_muugs["Haps"] = haps
+    return res_muugs
+
+
+def aggregate_muug_results_from_haps(res_haps):
+    """Aggregate phased pairs into genotypes - the sum `write_umug` does inline.
+
+    Built in the order the pairs come in, because the writers sort by
+    probability with a stable sort and so settle ties on insertion order.
+    """
+    res_muugs = {}
+    for idx, pair in enumerate(res_haps["Haps"]):
+        hap1, hap2 = pair[0], pair[1]
+        prob = res_haps["Probs"][idx]
+        haps = [hap1.split("~"), hap2.split("~")]
+        muug = ""
+        for i in range(len(haps[0])):
+            sort_hap = sorted([haps[0][i], haps[1][i]])
+            muug += sort_hap[0] + "+" + sort_hap[1] + "^"
+        muug = muug[:-1]
+        if muug in res_muugs:
+            res_muugs[muug] += prob
+        else:
+            res_muugs[muug] = prob
+    return res_muugs
+
+
+def aggregate_pop_results_from_haps(res_haps):
+    """Aggregate the population pairs - the sum `write_umug_pops` does inline."""
+    res_pops = {}
+    for idx in range(len(res_haps["Haps"])):
+        pops = sorted([res_haps["Pops"][idx][0], res_haps["Pops"][idx][1]])
+        muug = pops[0] + "," + pops[1]
+        prob = res_haps["Probs"][idx]
+        if muug in res_pops:
+            res_pops[muug] += prob
+        else:
+            res_pops[muug] = prob
+    return res_pops
+
+
+def truncate_haps(res_haps, number_of_results):
+    """Sort the pairs by probability and keep the best `number_of_results`.
+
+    The sort happens even when there is nothing to cut: the old path inherited
+    probability-descending order from the round trip through `don.pmug`, and
+    every aggregation downstream depends on it.
+    """
+    haps = res_haps.get("Haps")
+    if not isinstance(haps, list) or not haps:
+        return res_haps
+
+    order = sorted(
+        range(len(haps)), key=lambda idx: res_haps["Probs"][idx], reverse=True
+    )
+    if number_of_results is not None:
+        order = order[:number_of_results]
+
+    res_haps["Haps"] = [haps[idx] for idx in order]
+    res_haps["Probs"] = [res_haps["Probs"][idx] for idx in order]
+    res_haps["Pops"] = [res_haps["Pops"][idx] for idx in order]
+    return res_haps
+
+
+def finalize_results(
+    res_muugs, res_haps, extra_gl, number_of_results, umug_from_full_results=False
+):
+    """Apply `extra_gl` to the whole candidate set, then cut it down to size.
+
+    Replaces `change_output_by_extra_gl`, and has to do both of that function's
+    jobs. Besides filtering by `extra_gl` it rebuilds the MUUG results from the
+    pairs that survive the cut, which the old pass did for every donor it read
+    out of `don.pmug` - donors with no `extra_gl` included.
+
+    Returns `(res_muugs, res_haps, missed)`. `missed` is True only when the
+    donor had candidates and none of them is consistent with `extra_gl`: that
+    is the one case that still belongs in `don.miss`.
+    """
+    haps = res_haps.get("Haps")
+    # "NaN"/"Nan" rather than a list means the imputation produced no phased
+    # pairs at all - there is nothing here to filter, truncate or aggregate.
+    have_haps = isinstance(haps, list)
+
+    if extra_gl and have_haps and haps:
+        res_haps = filter_results(res_haps, extra_gl)
+        if not res_haps["Haps"]:
+            return {"MaxProb": 0, "Haps": {}, "Pops": {}}, res_haps, True
+
+    if umug_from_full_results:
+        if extra_gl:
+            res_muugs = filter_muug_results(res_muugs, extra_gl)
+        if have_haps:
+            res_muugs["Pops"] = aggregate_pop_results_from_haps(res_haps)
+        res_haps = truncate_haps(res_haps, number_of_results)
+    else:
+        res_haps = truncate_haps(res_haps, number_of_results)
+        if have_haps:
+            res_muugs["Haps"] = aggregate_muug_results_from_haps(res_haps)
+            res_muugs["Pops"] = aggregate_pop_results_from_haps(res_haps)
+
+    return res_muugs, res_haps, False

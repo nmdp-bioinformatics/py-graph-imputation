@@ -16,4 +16,5 @@
 | epsilon | Genotypes with smaller probability than this value will be discarded. |
 | max_haplotypes_number_in_phase | Limits the number of processed haplotypes in each phase. |
 | Plan_A_Matrix | A list of nodes to plan A. The full-locus nodes will be created anyway, whether they are on the list or not. If the list is empty or this field is missing, all nodes and edges will be created. |
+| num_processes | How many subjects to impute at a time. 1 (the default) imputes in a single process, any number above 1 forks that many workers. The workers share the graph the parent builds, so more of them costs cores rather than memory. |
 | save_space_mode | Reduce options in plan B and C if there are too much alleles. Suitable for 9-locus. Default - False |

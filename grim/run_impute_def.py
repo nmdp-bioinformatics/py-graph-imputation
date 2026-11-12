@@ -5,6 +5,7 @@ import pathlib
 import sys
 import os
 from pathlib import Path
+import pickle as pkl
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 
@@ -44,6 +45,7 @@ def run_impute(
     project_dir_in_file="",
     hap_pop_pair=False,
     graph=None,
+    extra_gl_by_id=None,
 ):
     configuration_file = conf_file
 
@@ -126,6 +128,15 @@ def run_impute(
         "nodes_for_plan_A": json_conf.get("Plan_A_Matrix", []),
         "save_mode": json_conf.get("save_space_mode", False),
         "UNK_priors": json_conf.get("UNK_priors", "MR"),
+        "graph_path": json_conf.get("graph_path", "graph.pkl"),
+        # How many subjects to impute at a time. The workers share this
+        # process' graph, so this is a question of cores, not of memory.
+        "num_processes": json_conf.get("num_processes", 1),
+        # Where `don.umug` comes from once the extra-GL filter runs inside the
+        # imputation: False derives it from the top `number_of_results` pairs,
+        # the way the post-imputation pass did, True from the full filtered
+        # aggregation.
+        "umug_from_full_results": json_conf.get("umug_from_full_results", False),
     }
 
     # Display the configurations we are using
@@ -164,6 +175,7 @@ def run_impute(
     print("\tOutput Miss Filename: {}".format(config["imputation_out_miss_file"]))
     print("\tOutput Problem Filename: {}".format(config["imputation_out_problem_file"]))
     print("\tFactor Missing Data: {}".format(config["factor_missing_data"]))
+    print("\tDonors Graph Path: {}".format(config["graph_path"]))
     print("\tLoci Map: {}".format(config["loci_map"]))
     print("\tPlan B Matrix: {}".format(config["matrix_planb"]))
     print("\tPops Count File: {}".format(config["pops_count_file"]))
@@ -181,6 +193,12 @@ def run_impute(
     if config["nodes_for_plan_A"]:
         print("\tNodes in plan A: {}".format(config["nodes_for_plan_A"]))
     print("\tSave space mode: {}".format(config["save_mode"]))
+    print("\tProcesses: {}".format(config["num_processes"]))
+    if extra_gl_by_id is not None:
+        print(
+            "\tFiltering by extra GL before truncation, UMUG from full "
+            "results: {}".format(config["umug_from_full_results"])
+        )
     print(
         "****************************************************************************************************"
     )
@@ -191,18 +209,21 @@ def run_impute(
 
     config["full_loci"] = "".join(sorted(all_loci_set))
     # Perform imputation
-    if graph == None:
+    if graph is None:
         graph = Graph(config)
         graph.build_graph(
             config["node_file"], config["top_links_file"], config["edges_file"]
         )
+        with open(config["graph_path"], "wb") as fout:
+            pkl.dump(graph, fout)
+
     imputation = Imputation(graph, config)
 
     # Create output directory if it doesn't exist
     pathlib.Path(output_dir).mkdir(parents=False, exist_ok=True)
 
     # Write out the results from imputation
-    imputation.impute_file(config, em_mr=hap_pop_pair)
+    imputation.impute_file(config, em_mr=hap_pop_pair, extra_gl_by_id=extra_gl_by_id)
 
     # Profiler end
     # pr.disable()

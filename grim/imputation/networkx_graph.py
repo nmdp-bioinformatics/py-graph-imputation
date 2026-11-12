@@ -4,11 +4,33 @@ Create a data structure of directed Graph suitable for our needs with numpy arra
 """
 
 import csv
-import numpy as np
-import pandas as pd
 import gc
-from tqdm.auto import tqdm
+import sys
 import time
+from array import array
+from contextlib import contextmanager
+
+import numpy as np
+from tqdm.auto import tqdm
+
+
+@contextmanager
+def _phase(desc):
+    """Progress marker for the (otherwise silent) post-edge-load graph-build
+    phases — the steps that run AFTER "All Edges Creation" and account for most
+    of a large graph's load time. Prints '<desc> ...' then '<desc> done (Ns)'.
+
+    Unlike the per-row tqdm bars (which are suppressed by TQDM_DISABLE because
+    of their '\\r' spam), these emit ONE line per phase, so they're always shown
+    — that's the whole point: to reveal where a slow load is spending time.
+    Uses tqdm.write so it interleaves cleanly if any bars are active.
+    """
+    tqdm.write(f"[graph build] {desc} ...")
+    t0 = time.time()
+    try:
+        yield
+    finally:
+        tqdm.write(f"[graph build] {desc} done ({time.time() - t0:.1f}s)")
 
 
 class Graph(object):
@@ -40,41 +62,54 @@ class Graph(object):
                     self.nodes_plan_b.append(item.strip())
 
     def build_graph(self, nodesFile, edgesFile, allEdgesFile):
-        """Build the graph by scanning the three files, line by line and filling up the class variables."""
-        nodesDict = dict()
+        """Build the graph by scanning the three files, line by line and filling up the class variables.
+
+        Memory notes: edges are accumulated as packed uint64 keys
+        ``(src << 32) | dst`` in ``array('Q')`` buffers (8 bytes/edge) instead of
+        Python lists of 2-item lists of strings (~150-200 bytes/edge), which
+        also removes the string->uint32 ``np.vstack`` copy. Sorting the keys is
+        identical to the previous ``np.lexsort((col1, col0))``, and ``np.unique``
+        on the keys replaces pandas ``drop_duplicates`` + lexsort for the whole
+        edges. The resulting arrays are identical to the previous implementation.
+        """
+        nodesDict = dict()  # csv node id (int) -> haplotype name
         with open(nodesFile) as nodesfile:
             readNodes = csv.reader(nodesfile, delimiter=",")
             next(readNodes)
             for row in tqdm(readNodes, desc="Vertices Creation:"):
                 if len(row) > 0:
-                    if not self.nodes_plan_a or row[2] in self.nodes_plan_a:
-                        self.Vertices.append(row[1])
+                    name = row[1]
+                    # Labels repeat for every node of a loci combination; share one object.
+                    label = sys.intern(row[2])
+                    in_plan_a = not self.nodes_plan_a or label in self.nodes_plan_a
+                    in_plan_b = not self.nodes_plan_b or label in self.nodes_plan_b
+                    # Parse once; plan A and plan B attributes share the same (read-only) list.
+                    freqs = (
+                        list(map(float, row[3].split(";")))
+                        if in_plan_a or in_plan_b
+                        else None
+                    )
+                    if in_plan_a:
+                        self.Vertices.append(name)
                         vertex_id = len(self.Vertices) - 1
-                        self.Vertices_attributes[row[1]] = (
-                            row[2],
-                            list(map(float, row[3].split(";"))),
-                            vertex_id,
-                        )
+                        self.Vertices_attributes[name] = (label, freqs, vertex_id)
 
-                    if not self.nodes_plan_b or row[2] in self.nodes_plan_b:
-                        self.Whole_Vertices.append(row[1])
+                    if in_plan_b:
+                        self.Whole_Vertices.append(name)
                         vertex_id = len(self.Whole_Vertices) - 1
-                        self.Whole_Vertices_attributes[row[1]] = (
-                            row[2],
-                            list(map(float, row[3].split(";"))),
-                            vertex_id,
-                        )
+                        self.Whole_Vertices_attributes[name] = (label, freqs, vertex_id)
 
-                    nodesDict[row[0]] = row[1]
+                    nodesDict[int(row[0])] = name
 
+        edge_keys = array("Q")
         # Add edges from file
         with open(edgesFile) as edgesfile:
             readEdges = csv.reader(edgesfile, delimiter=",")
             next(readEdges)
             for row in tqdm(readEdges, desc="Edges Creation:"):
                 if len(row) > 0:
-                    node1_id = row[0]
-                    node2_id = row[1]
+                    node1_id = int(row[0])
+                    node2_id = int(row[1])
                     node1 = nodesDict[node1_id]
                     node2 = nodesDict[node2_id]
                     if (
@@ -83,22 +118,32 @@ class Graph(object):
                     ):
                         node1_label = self.Vertices_attributes[node1][0]
                         if node1_label == self.full_loci:
-                            self.Edges.append([node2_id, node1_id])
+                            edge_keys.append((node2_id << 32) | node1_id)
                         else:
-                            self.Edges.append([node1_id, node2_id])
+                            edge_keys.append((node1_id << 32) | node2_id)
 
+        whole_edge_keys = array("Q")
         # add edges from file
         with open(allEdgesFile) as allEdgesfile:
             readEdges = csv.reader(allEdgesfile, delimiter=",")
             next(readEdges)
             for row in tqdm(readEdges, "All Edges Creation:"):
                 if len(row) > 0:
-                    node1_id = row[0]
-                    node2_id = row[1]
+                    node1_id = int(row[0])
+                    node2_id = int(row[1])
                     node1 = nodesDict[node1_id]
                     node2 = nodesDict[node2_id]
-                    node1_label = self.Whole_Vertices_attributes[node1][0]
-                    node2_label = self.Whole_Vertices_attributes[node2][0]
+                    node1_attr = self.Whole_Vertices_attributes[node1]
+                    node2_attr = self.Whole_Vertices_attributes[node2]
+                    node1_label = node1_attr[0]
+                    node2_label = node2_attr[0]
+                    # Whole_Edges is consumed as positional indices into
+                    # Whole_Vertices (self.Whole_Vertices[self.Whole_Edges[...]]),
+                    # so edges must reference vertex POSITIONS, not the raw CSV
+                    # node ids. The position of each real vertex is stored as the
+                    # third element of its attribute tuple.
+                    node1_pos = node1_attr[2]
+                    node2_pos = node2_attr[2]
 
                     if len(node1_label) < len(node2_label):
                         # Create a connector
@@ -109,12 +154,12 @@ class Graph(object):
                             connector_id = len(self.Whole_Vertices) - 1
                             self.Whole_Vertices_attributes[connector] = connector_id
 
-                            self.Whole_Edges.append([node1_id, connector_id])
+                            whole_edge_keys.append((node1_pos << 32) | connector_id)
                         else:
                             connector_id = self.Whole_Vertices_attributes[connector]
 
                         # Append the connector to the whole edges array
-                        self.Whole_Edges.append([connector_id, node2_id])
+                        whole_edge_keys.append((connector_id << 32) | node2_pos)
 
                     else:
                         # Create a connector
@@ -126,91 +171,70 @@ class Graph(object):
                             self.Whole_Vertices_attributes[connector] = connector_id
 
                         # Append the connector to the whole edges array
-                        self.Whole_Edges.append([node2_id, connector_id])
-                        self.Whole_Edges.append([connector_id, node1_id])
+                        whole_edge_keys.append((node2_pos << 32) | connector_id)
+                        whole_edge_keys.append((connector_id << 32) | node1_pos)
 
         nodesDict.clear()
         del nodesDict
 
-        # Concat all the lists of the edges lists to a numpy array
-        self.Edges = np.vstack(self.Edges).astype(np.uint32)
-        self.Whole_Edges = np.vstack(self.Whole_Edges).astype(np.uint32)
+        # Sort the packed (src, dst) keys: same order as lexsort by (src, dst).
+        with _phase("Sorting edges"):
+            keys = np.frombuffer(edge_keys, dtype=np.uint64).copy()
+            del edge_keys
+            keys.sort()
+            edges_src = (keys >> np.uint64(32)).astype(np.uint32)
+            self.Edges = (keys & np.uint64(0xFFFFFFFF)).astype(np.uint32)
+            del keys
+
+        # Drop duplicate whole edges and sort them in one step.
+        with _phase("Dropping duplicate whole edges + sorting"):
+            keys = np.unique(np.frombuffer(whole_edge_keys, dtype=np.uint64))
+            del whole_edge_keys
+            whole_edges_src = (keys >> np.uint64(32)).astype(np.uint32)
+            self.Whole_Edges = (keys & np.uint64(0xFFFFFFFF)).astype(np.uint32)
+            del keys
+
         self.Vertices = np.array(self.Vertices, dtype=np.object_)
         self.Whole_Vertices = np.array(self.Whole_Vertices, dtype=np.object_)
 
-        # Drop duplications in edges
-        df_e = pd.DataFrame(self.Whole_Edges)
-        df_e.drop_duplicates(inplace=True)
-        del self.Whole_Edges
-        self.Whole_Edges = df_e.to_numpy()
-        del df_e
-
-        # Sort the Edges arrays - Takes numpy to sort an array of size (10**8, 2) about 45 secs on Google Colab.
-        sorted_indices = np.lexsort((self.Edges[:, 1], self.Edges[:, 0]))
-        self.Edges = self.Edges[sorted_indices]
-        sorted_indices = np.lexsort((self.Whole_Edges[:, 1], self.Whole_Edges[:, 0]))
-        self.Whole_Edges = self.Whole_Edges[sorted_indices]
-
-        # Save memory
-        del sorted_indices
-
         # Create a list of the first appearance of a number in the 0 column in the matrix
-        unique_values, first_occurrences_indices = np.unique(
-            self.Edges[:, 0], return_index=True
-        )
+        with _phase("Indexing neighbors (edges)"):
+            self.Neighbors_start = self._neighbors_start(
+                edges_src, self.Vertices.shape[0], "Neighbors index:"
+            )
+            del edges_src
 
-        j = 0
-        for i in range(0, self.Vertices.shape[0]):
-            if int(unique_values[j]) == i:
-                self.Neighbors_start.append(int(first_occurrences_indices[j]))
-                j += 1
-            else:
-                try:
-                    self.Neighbors_start.append(self.Neighbors_start[-1])
-                except:  # In case of the start of the list - empty list
-                    self.Neighbors_start.append(0)
-
-        # Free some memory
-        del unique_values, first_occurrences_indices
-
-        # Create a list of the first appearance of a number in the 0 column in the matrix
-        unique_values, first_occurrences_indices = np.unique(
-            self.Whole_Edges[:, 0], return_index=True
-        )
-
-        j = 0
-        for i in range(0, self.Whole_Vertices.shape[0]):
-            if int(unique_values[j]) == i:
-                self.Whole_Neighbors_start.append(int(first_occurrences_indices[j]))
-                j += 1
-            else:
-                try:
-                    self.Whole_Neighbors_start.append(self.Whole_Neighbors_start[-1])
-                except:  # In case of the start of the list - empty list
-                    self.Whole_Neighbors_start.append(0)
-
-        # Free some memory
-        del unique_values, first_occurrences_indices
-
-        self.Neighbors_start.append(int(len(self.Vertices)))
-        self.Whole_Neighbors_start.append(int(len(self.Whole_Vertices)))
-
-        self.Neighbors_start = np.array(self.Neighbors_start, dtype=np.uint32)
-        self.Whole_Neighbors_start = np.array(
-            self.Whole_Neighbors_start, dtype=np.uint32
-        )
-
-        # Take the first column out of the Edges arrays
-        ### Do the following to massive save of memory
-        Edges = self.Edges[:, 1].copy()
-        del self.Edges
-        self.Edges = Edges
-
-        Whole_Edges = self.Whole_Edges[:, 1].copy()
-        del self.Whole_Edges
-        self.Whole_Edges = Whole_Edges
+        with _phase("Indexing neighbors (whole edges)"):
+            self.Whole_Neighbors_start = self._neighbors_start(
+                whole_edges_src, self.Whole_Vertices.shape[0], "Whole neighbors index:"
+            )
+            del whole_edges_src
 
         gc.collect()
+
+    @staticmethod
+    def _neighbors_start(src, n_vertices, desc):
+        """Start offset of each vertex's block in the (sorted) edge source column,
+        plus a trailing ``n_vertices`` sentinel, as a uint32 array.
+
+        Kept loop-for-loop identical to the original implementation (including
+        how vertices without outgoing edges inherit the previous offset).
+        """
+        unique_values, first_occurrences_indices = np.unique(src, return_index=True)
+        starts = []
+        j = 0
+        for i in tqdm(range(0, n_vertices), desc=desc):
+            if int(unique_values[j]) == i:
+                starts.append(int(first_occurrences_indices[j]))
+                j += 1
+            else:
+                try:
+                    starts.append(starts[-1])
+                except IndexError:  # In case of the start of the list - empty list
+                    starts.append(0)
+        del unique_values, first_occurrences_indices
+        starts.append(int(n_vertices))
+        return np.array(starts, dtype=np.uint32)
 
     def haps_by_label(self, label):
         """Find haplotypes by their labels.
@@ -229,8 +253,13 @@ class Graph(object):
                     hapsList.append(haplotype)
         elif label in self.nodes_plan_b:
             for haplotype, hap_label in self.Whole_Vertices_attributes.items():
-                hap_label = hap_label[0]
-                if hap_label == label:
+                # Whole_Vertices_attributes holds two kinds of values: real
+                # haplotype vertices map to a (label, probs, id) tuple, while
+                # connector nodes added during graph build map to a bare int id.
+                # Only the real haplotypes carry a label, so skip connectors.
+                if not isinstance(hap_label, tuple):
+                    continue
+                if hap_label[0] == label:
                     hapsList.append(haplotype)
         self.labelDict[label] = hapsList
         return hapsList
