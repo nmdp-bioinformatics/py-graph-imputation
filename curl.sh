@@ -1,0 +1,1 @@
+curl -X GET "http://localhost:5000/impute?glstring=A*03%3A101%3A01%2BA*30%3A01%3A01%5EB*13%3A02%3A01%2BB*35%3A02%3A01%5EC*04%3A01%3A01%2BC*06%3A02%3A01%5EDRB1*07%3A01%3A01%2BDRB1*11%3A04%3A01&graph=us_broad_4loc_0.1&output=both&number_of_results=30&expand=auto" -H "accept: application/json"
