@@ -362,6 +362,7 @@ def generate_graph(
     # For each loci block, get all the allele combinations. Create parents link, and accumulate the freqs to create new Haplotype Nodes.
 
     for loci in all_combo_list:
+        print(f"running for locus {loci}", file=sys.stderr)
         if loci != FULL_LOCI:  # FULL_LOCI is already in the dictionary
             loci_map = loci_combo_map[loci]
             loci_indices = find_indices(FULL_LOCI, loci)
@@ -418,6 +419,7 @@ def generate_graph(
 
     header = ["haplotypeId:ID(HAPLOTYPE)", "name", "loci:LABEL", "frequency:DOUBLE[]"]
     node_file = csvdir + conf.get("node_csv_file")
+    print("build nodes file", file=sys.stderr)
     with open(node_file, mode="w") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(header)
@@ -433,6 +435,7 @@ def generate_graph(
 
     edgeheader = [":START_ID(HAPLOTYPE)", ":END_ID(HAPLOTYPE)", "CP:DOUBLE[]", ":TYPE"]
     edge_file = csvdir + conf.get("edges_csv_file")
+    print("build edges file", file=sys.stderr)
     with open(edge_file, mode="w") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(edgeheader)
@@ -458,6 +461,7 @@ def generate_graph(
 
     topheader = [":START_ID(HAPLOTYPE)", ":END_ID(HAPLOTYPE)", ":TYPE"]
     top_links_file = csvdir + conf.get("top_links_csv_file")
+    print("build top links file", file=sys.stderr)
     with open(top_links_file, mode="w") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(topheader)
