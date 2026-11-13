@@ -186,3 +186,7 @@ data/subjects/us.18.60.csv.gz
 
 graphs/
 graphs_wmda/
+
+# Personal helper scripts (kept locally, not part of the repo)
+curl.sh
+gen.sh

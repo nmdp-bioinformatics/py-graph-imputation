@@ -408,11 +408,11 @@ GRIM_EAGER=1 gunicorn \
   'api_server:app'
 ```
 
-Or just use the provided script (defaults: 4 workers, preload, discovery):
+Or just use the provided script (defaults: 6 workers, preload, discovery):
 
 ```bash
-./martin_launch_server_gunicorn.sh
-# override: WORKERS=8 PORT=5000 TIMEOUT=300 ./martin_launch_server_gunicorn.sh
+./launch_server_gunicorn.sh
+# override: WORKERS=8 PORT=5000 TIMEOUT=300 ./launch_server_gunicorn.sh
 ```
 
 ### Why `--preload` + `GRIM_EAGER` matters here

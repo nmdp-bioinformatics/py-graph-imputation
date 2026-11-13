@@ -3,7 +3,7 @@
 
 set -e
 
-cd /Users/mmaiers/Dropbox/MacBookPro/2020/src/git/py-graph-imputation
+cd "$(dirname "$0")"  # run from the repo root regardless of the caller's cwd
 
 echo "🧪 Testing Web API Setup"
 echo "======================="

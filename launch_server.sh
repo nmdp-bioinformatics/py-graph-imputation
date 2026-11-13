@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /Users/mmaiers/Dropbox/MacBookPro/2020/src/git/py-graph-imputation
+cd "$(dirname "$0")"  # run from the repo root regardless of the caller's cwd
 
 # Kill any running api_server.py (matches however it was launched: with or
 # without --graph/--config). -f matches the full command line; the pattern is

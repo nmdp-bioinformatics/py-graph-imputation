@@ -13,17 +13,17 @@
 # cold-start latency.
 #
 # Tunables (override via env):
-#   WORKERS   number of worker processes (default 8; box has 10 cores)
+#   WORKERS   number of worker processes (default 6; box has 10 cores)
 #   PORT      bind port (default 5000)
 #   TIMEOUT   worker timeout secs — must exceed the eager graph-build time
-#             (large 4-locus graphs can take ~60-90s to load) (default 300)
+#             (large 4-locus graphs can take ~60-90s to load) (default 120)
 #   LOGLEVEL  app log level (default INFO)
 
-cd /Users/mmaiers/Dropbox/MacBookPro/2020/src/git/py-graph-imputation
+cd "$(dirname "$0")"  # run from the repo root regardless of the caller's cwd
 
-WORKERS="${WORKERS:-8}"
+WORKERS="${WORKERS:-6}"
 PORT="${PORT:-5000}"
-TIMEOUT="${TIMEOUT:-300}"
+TIMEOUT="${TIMEOUT:-120}"
 LOGLEVEL="${LOGLEVEL:-INFO}"
 
 # Stop any running server (gunicorn masters/workers OR a plain api_server.py),
