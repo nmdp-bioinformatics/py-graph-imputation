@@ -1,2 +1,7 @@
 [build-system]
 requires = ["setuptools", "wheel", "Cython==3.2.4", "legacy-cgi", "tqdm", "legacy-cgi", "numpy>=1.20.2",  "pandas"]
+
+[tool.pytest.ini_options]
+# Top-level modules (imputation_service, graph_factory, ...) live in the repo
+# root, so make it importable without PYTHONPATH=. (pytest >= 7).
+pythonpath = ["."]

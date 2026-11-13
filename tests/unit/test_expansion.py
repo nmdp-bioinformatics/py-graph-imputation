@@ -35,7 +35,6 @@ import pytest
 
 import imputation_service as svc
 
-
 # ---------------------------------------------------------------------------
 # _has_ambiguous_codes: detects XX codes, MAC codes, and serology
 # ---------------------------------------------------------------------------

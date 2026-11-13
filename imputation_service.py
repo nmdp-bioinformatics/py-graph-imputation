@@ -22,7 +22,6 @@ import numpy as np
 from grim.imputation.impute import Imputation, clean_up_gl  # noqa: F401
 from grim.imputation.networkx_graph import Graph
 
-
 # Module logger. The application (e.g. api_server) is responsible for
 # configuring handlers/levels; by default this logger inherits the root config.
 logger = logging.getLogger("imputation_service")
