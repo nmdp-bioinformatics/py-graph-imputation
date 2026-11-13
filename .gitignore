@@ -141,3 +141,52 @@ grim/**/*.c
 
 .DS_Store
 output/
+
+# Large run/imputation artifact directories
+output6/
+imputation_output/
+
+# Local experiment scripts
+au.sh
+r.sh
+unos.sh
+in
+scripts/i.sh
+scripts/imp.sh
+scripts/wmda-imputation.sh
+
+# Local/extra READMEs
+README.2025-07-20.md
+README.how_to_run_it.md
+
+# UI-generated configs and local config experiments
+conf/config_*.json
+conf/5.json
+conf/6loc.json
+conf/6to7.json
+conf/RUN.json
+
+# Local data artifacts / symlinks
+data/4loc
+data/5loc
+data/6loc
+data/7freqs
+data/6loc.hpf.csv
+data/gl.redux.csv
+data/mrp.gl
+data/ipatients.txt
+data/ipatients.10.txt
+data/AU/
+data/freqs/6loc
+data/freqs/ms-6loc
+data/freqs/counts.txt
+data/subjects/donor.imp.csv
+data/subjects/hla.csv
+data/subjects/us.18.60.csv.gz
+
+graphs/
+graphs_wmda/
+
+# Personal helper scripts (kept locally, not part of the repo)
+curl.sh
+gen.sh
