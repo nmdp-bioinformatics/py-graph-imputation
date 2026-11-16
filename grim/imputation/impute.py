@@ -1799,11 +1799,9 @@ class Imputation(object):
         #
         phases = self.open_phases(pmags, n_loci, gl_string)
         if not phases:
-            print("in reduce_phase_to_valid_alleles")
             self.reduce_phase_to_valid_allels(pmags, n_loci)
             phases = self.open_phases(pmags, n_loci, gl_string)
         if not phases:
-            print("in reduce_phase_to_commons_alleles")
             self.reduce_phase_to_commons_alleles(pmags, n_loci, commons_number=10)
             phases = self.open_phases(pmags, n_loci, gl_string)
 
